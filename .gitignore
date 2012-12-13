@@ -1,0 +1,17 @@
+*.o
+*.d
+*.~
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+.metadata/
+bin/
+Debug/
+
+.kdatabase.properties
+
+*.sqlite
