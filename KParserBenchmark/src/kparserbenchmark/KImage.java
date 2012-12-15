@@ -1,3 +1,19 @@
+/*******************************************************************************
+ Copyright (c) 2012 kopson kopson.piko@gmail.com
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ *******************************************************************************/
+
 package kparserbenchmark;
 
 import java.net.URL;
@@ -16,7 +32,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
- * Image utilities class
+ * Image utilities class. Provides image create and manipulate functions, paths<br>
+ * for resource images and static image objects precreated to avoid memory leaks.
  * 
  * @author kopson
  */
@@ -28,10 +45,13 @@ public class KImage {
 	public static final String IMG_PROJECT_FILE = "/icons/document_24.png";
 	public static final String IMG_OK_STATUS = "/icons/tick_16.png";
 	public static final String IMG_ERR_STATUS = "/icons/cross_16.png";
+	public static final String IMG_CANCEL_STATUS = "/icons/delete_16.png";
+	public static final String IMG_SCRIPT_EDITOR = "icons/pencil_16.png";
 	
 	//Resource images
 	private static Image okStatusImage = getImageDescriptor(IMG_OK_STATUS).createImage();
 	private static Image errStatusImage =  getImageDescriptor(IMG_ERR_STATUS).createImage();
+	private static Image cancelStatusImage =  getImageDescriptor(IMG_CANCEL_STATUS).createImage();
 	
 	/**
 	 * This class should be never instantiate
@@ -40,20 +60,20 @@ public class KImage {
 	}
 
 	/**
-	 * Return shared image eg. ISharedImages.IMG_OBJ_FOLDER
+	 * Return eclipse shared image eg. ISharedImages.IMG_OBJ_FOLDER
 	 * 
-	 * @param image
-	 * @return
+	 * @param image Shared image id
+	 * @return Shared image or NULL if not found
 	 */
 	public static Image getSharedImage(String image) {
 		return PlatformUI.getWorkbench().getSharedImages().getImage(image);
 	}
 
 	/**
-	 * Returns image descriptor from project's resources
+	 * Return image descriptor from project's resources
 	 * 
-	 * @param id
-	 * @return
+	 * @param id Image path to icons directory
+	 * @return Returns image descriptor or NULL if not found
 	 */
 	public static ImageDescriptor getImageDescriptor(String id) {
 		return AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
@@ -61,10 +81,10 @@ public class KImage {
 	}
 
 	/**
-	 * Returns image descriptor from project's resources
+	 * Return image descriptor from bundle's entry
 	 * 
-	 * @param id
-	 * @return
+	 * @param id Image path to icons directory
+	 * @return Returns image descriptor or NULL if not found
 	 */
 	public static ImageDescriptor createImageDescriptorFor(String id) {
 		URL url = Platform.getBundle(Activator.PLUGIN_ID).getEntry(id);
@@ -72,30 +92,37 @@ public class KImage {
 	}
 
 	/**
-	 * Draws image on window surface
+	 * Draw image on the window surface
 	 * 
-	 * @param parent
+	 * @param parent Window composite 
+	 * @param image Image to draw
+	 * @param x X position of image
+	 * @param y Y position of image
+	 * @return Returns canvas on which image will be drawn
 	 */
 	public static Canvas drawImage(Composite parent, final Image image,
 			final int x, final int y) {
-		// Create the canvas for drawing
+		assert(parent != null && image != null);
 		Canvas canvas = new Canvas(parent, SWT.NONE);
 		canvas.addPaintListener(new PaintListener() {
 			public void paintControl(PaintEvent e) {
 				GC gc = e.gc;
 				gc.drawImage(image, x, y);
+				gc.dispose();
 			}
 		});
 		return canvas;
 	}
 
+	//TODO: Create method to remove image from window surface
+	
 	/**
-	 * Resize image
+	 * Resize image without disposing input image. It may cause memory leaks<br>
 	 * 
-	 * @param image
-	 * @param width
-	 * @param height
-	 * @return
+	 * @param image Image to resize
+	 * @param width New image width
+	 * @param height New image height
+	 * @return Returns resized image
 	 */
 	public static Image resize(Image image, int width, int height) {
 		return resize(image, width, height, false);
@@ -104,37 +131,42 @@ public class KImage {
 	/**
 	 * Resize image
 	 * 
-	 * @param image
-	 * @param width
-	 * @param height
-	 * @param dispose
-	 * @return
+	 * @param image Image to resize
+	 * @param width New image width
+	 * @param height New image height
+	 * @param dispose If true disposes input image
+	 * @return Returns resized image
 	 */
 	public static Image resize(Image image, int width, int height,
 			boolean dispose) {
+		assert(width > 0 && height > 0);
+		assert(image != null);
+		
 		Image scaled = new Image(Display.getDefault(), width, height);
 		GC gc = new GC(scaled);
 		gc.setAntialias(SWT.ON);
 		gc.setInterpolation(SWT.HIGH);
 		gc.drawImage(image, 0, 0, image.getBounds().width,
 				image.getBounds().height, 0, 0, width, height);
+		gc.dispose();
 		if (dispose)
-			gc.dispose();
-		image.dispose(); // don't forget about me!
+			image.dispose();
 		return scaled;
 	}
 
 	/**
-	 * Return resource image
+	 * Return resource image. Do not dispose this image!
 	 * 
-	 * @param img
-	 * @return
+	 * @param img Image path
+	 * @return Returns static image or NULL if image path is incorrect
 	 */
 	public static Image getImage(String img) {
 		if (img.equals(IMG_OK_STATUS))
 			return okStatusImage;
 		else if (img.equals(IMG_ERR_STATUS))
 			return errStatusImage;
+		else if (img.equals(IMG_CANCEL_STATUS))
+			return cancelStatusImage;
 		else
 			return null;
 	}

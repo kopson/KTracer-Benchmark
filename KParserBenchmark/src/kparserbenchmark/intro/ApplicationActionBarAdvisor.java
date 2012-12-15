@@ -1,6 +1,7 @@
 package kparserbenchmark.intro;
 
 import kparserbenchmark.commands.OpenProjectAction;
+import kparserbenchmark.commands.ScriptEditorAction;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -16,7 +17,8 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	// Open project Action
-	private OpenProjectAction openAction;
+	private OpenProjectAction openProjectAction;
+	private ScriptEditorAction openEditorAction;
 
 	/*
 	 * (non-Javadoc)
@@ -29,14 +31,20 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	@Override
 	protected void makeActions(IWorkbenchWindow window) {
-		openAction = new OpenProjectAction(window);
-		register(openAction);
+		openProjectAction = new OpenProjectAction(window);
+		register(openProjectAction);
+		
+		openEditorAction = new ScriptEditorAction(window);
+		register(openEditorAction);
 	}
 
 	@Override
 	protected void fillMenuBar(IMenuManager menuBar) {
-		MenuManager mainMenu = new MenuManager("&Project", "KParserBenchmark.projectMenu");
-		mainMenu.add(openAction);
-		menuBar.add(mainMenu);
+		MenuManager fileMenu = new MenuManager("&File", "KParserBenchmark.fileMenu");
+		fileMenu.add(openEditorAction);
+		menuBar.add(fileMenu);
+		MenuManager projectMenu = new MenuManager("&Project", "KParserBenchmark.projectMenu");
+		projectMenu.add(openProjectAction);
+		menuBar.add(projectMenu);
 	}
 }

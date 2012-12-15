@@ -1,3 +1,19 @@
+/*******************************************************************************
+ Copyright (c) 2012 kopson kopson.piko@gmail.com
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ *******************************************************************************/
+
 package kparserbenchmark;
 
 import java.io.BufferedReader;
@@ -14,6 +30,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kparserbenchmark.intro.Application;
 import kparserbenchmark.projectexplorer.Project;
 
 /**
@@ -24,39 +41,42 @@ import kparserbenchmark.projectexplorer.Project;
 public class KFile extends File {
 
 	/**
-	 * ID
+	 * Serial version ID
 	 */
 	private static final long serialVersionUID = -6806813507430129712L;
 
 	/**
-	 * The constructor
+	 * The constructor overwrites standard File constructor
 	 * 
 	 * @param pathname
+	 *            File path
 	 */
 	public KFile(String pathname) {
 		super(pathname);
 	}
 
 	/**
-	 * Write property to file
+	 * Write project property to file in format: <br>
+	 * [name]=[value] <br>
+	 * If property already exists - overwrites its value.
 	 * 
-	 * @param propertyName
-	 * @param propertyValue
+	 * @param property
+	 *            Property name
+	 * @param value
+	 *            Property value
+	 * @return Returns true if property was written successfully
 	 */
-	public boolean writeProperty(Project.Properties property, String propertyValue) {
+	public boolean writeProperty(Project.Properties property, String value) {
 		try {
 			if (readProperty(property) == null) {
-				try {
-					BufferedWriter out = new BufferedWriter(new FileWriter(this, true));
-					out.write(property.name());
-					out.write("=");
-					out.write(propertyValue);
-					out.write("\n");
-					out.close();
-					return true;
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				BufferedWriter out = new BufferedWriter(new FileWriter(this,
+						true));
+				out.write(property.name());
+				out.write("=");
+				out.write(value);
+				out.write("\n");
+				out.close();
+				return true;
 			} else {
 				InputStream fis;
 				BufferedReader in;
@@ -70,15 +90,17 @@ public class KFile extends File {
 
 					while ((line = in.readLine()) != null) {
 						String[] words = line.split("=");
-						if (words.length == 2 && words[0].equals(property.name())) {
-							lines.add(property.name() + "=" + propertyValue + "\n");
+						if (words.length == 2
+								&& words[0].equals(property.name())) {
+							lines.add(property.name() + "=" + value + "\n");
 						} else {
 							lines.add(line);
 						}
 					}
 					in.close();
 
-					BufferedWriter out = new BufferedWriter(new FileWriter(this, false));
+					BufferedWriter out = new BufferedWriter(new FileWriter(
+							this, false));
 					for (String l : lines) {
 						out.write(l + "\n");
 					}
@@ -97,8 +119,9 @@ public class KFile extends File {
 	/**
 	 * Return property from file
 	 * 
-	 * @param propertyName
-	 * @return propertyValue or NULL if not found
+	 * @param property
+	 *            Property name
+	 * @return Property value or NULL if not found
 	 */
 	public String readProperty(Project.Properties property) {
 		InputStream fis;
@@ -116,6 +139,7 @@ public class KFile extends File {
 					return words[1];
 				}
 			}
+			in.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -126,9 +150,40 @@ public class KFile extends File {
 	}
 
 	/**
-	 * Removes directory and all its content
+	 * Get text from file
 	 * 
-	 * @param oldWorkspace
+	 * @return Returns string containing file data
+	 */
+	public String getText() {
+		InputStream fis;
+		BufferedReader in;
+		String line = "";
+		StringBuilder stringBuilder = new StringBuilder();
+		String ls = System.getProperty("line.separator");
+
+		try {
+			fis = new FileInputStream(this.getAbsolutePath());
+			in = new BufferedReader(new InputStreamReader(fis,
+					Charset.forName("UTF-8")));
+			while ((line = in.readLine()) != null) {
+				stringBuilder.append(line);
+				stringBuilder.append(ls);
+			}
+			in.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return stringBuilder.toString();
+	}
+
+	/**
+	 * Remove directory and all its content
+	 * 
+	 * @param path
+	 *            Directory path
 	 * @throws FileNotFoundException
 	 */
 	public static void removeDirectoryRecursive(String path)
@@ -146,12 +201,13 @@ public class KFile extends File {
 	}
 
 	/**
-	 * Check if toCheck string is a valid path:
-	 * 
-	 * - parent directory exists - destination directory name is valid
+	 * Check if toCheck string is a valid path to create a directory
 	 * 
 	 * @param toCheck
-	 * @return
+	 *            Path to check
+	 * @return Returns true if:<br>
+	 *         - parent directory exists<br>
+	 *         - destination directory name is a valid file name
 	 */
 	public static boolean isPathVaild(String toCheck) {
 		String retrName = toCheck;
@@ -187,5 +243,30 @@ public class KFile extends File {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Check if workspace is empty
+	 * 
+	 * @param path
+	 *            New workspace path
+	 * @return Returns true if new workspace is different from old workspace and
+	 *         old workspace is not empty
+	 */
+	public static boolean checkWorkspaceNotEmpty(String path) {
+		File oldWorkspace = new File(Application.getDefaultWorkspace());
+		// TODO: Return true only if workspace contains valid projects
+		try {
+			if (oldWorkspace.isDirectory() && oldWorkspace.list().length > 0
+					&& !oldWorkspace.getCanonicalPath().equals(path)) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

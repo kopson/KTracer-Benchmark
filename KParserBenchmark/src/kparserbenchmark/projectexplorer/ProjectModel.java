@@ -33,8 +33,7 @@ public class ProjectModel {
 					project.init(c.getAbsolutePath());
 					if (project.getCurrStatus() == Project.Status.OPENED) {
 						for (File c1 : c.listFiles()) {
-							Category file = new Category();
-							file.setName(c1.getName());
+							Category file = new Category(project, c1.getAbsolutePath(), c1.getName());
 							project.getElements().add(file);
 						}
 					}

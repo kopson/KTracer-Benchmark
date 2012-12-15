@@ -5,11 +5,46 @@
    <extension
          id="application"
          point="org.eclipse.core.runtime.applications">
-      <application>
+      <application
+            icon="icons/splash_icon_32.png">
          <run
                class="kparserbenchmark.intro.Application">
          </run>
       </application>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="KParserBenchmark.application"
+            description="KTracer Benchmark Tool"
+            name="KTracer">
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            class="kparserbenchmark.projectexplorer.ProjectExplorer"
+            icon="icons/box_16.png"
+            id="KParserBenchmark.projectExplorer"
+            name="Project"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="kparserbenchmark.editor.ScriptEditor"
+            default="false"
+            icon="icons/document_pencil_16.png"
+            id="KParserBenchmark.editor.mainEditor"
+            name="Script Editor">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
@@ -21,27 +56,21 @@
       </perspective>
    </extension>
    <extension
-         id="product"
-         point="org.eclipse.core.runtime.products">
-      <product
-            application="KParserBenchmark.application"
-            name="KTracer">
-         <property
-               name="windowImages"
-               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
-         </property>
-      </product>
-   </extension>
-   <extension
-         point="org.eclipse.ui.intro">
-      <intro
-            class="org.eclipse.ui.intro.config.CustomizableIntroPart"
-            id="kparserbenchmark.intro">
-      </intro>
-      <introProductBinding
-            introId="kparserbenchmark.intro"
-            productId="KParserBenchmark.product">
-      </introProductBinding>
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="*">
+         <view
+               id="KParserBenchmark.projectExplorer"
+               minimized="false"
+               moveable="true"
+               ratio="0.2f"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="true">
+         </view>
+      </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.intro.config">
@@ -59,19 +88,15 @@
       </config>
    </extension>
    <extension
-         point="org.eclipse.ui.views">
-      <view
-            class="kparserbenchmark.projectexplorer.ProjectExplorer"
-            id="KParserBenchmark.projectExplorer"
-            name="Project"
-            restorable="true">
-      </view>
-      <view
-            class="kparserbenchmark.projectexplorer.FileBrowser"
-            id="kparserbenchmark.projectexplorer.filebrowser"
-            name="File Browser"
-            restorable="true">
-      </view>
+         point="org.eclipse.ui.intro">
+      <intro
+            class="org.eclipse.ui.intro.config.CustomizableIntroPart"
+            id="kparserbenchmark.intro">
+      </intro>
+      <introProductBinding
+            introId="kparserbenchmark.intro"
+            productId="KParserBenchmark.product">
+      </introProductBinding>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
@@ -100,6 +125,11 @@
             id="KParserBenchmark.aboutCommand"
             name="About">
       </command>
+      <command
+            defaultHandler="org.eclipse.ui.internal.handlers.SaveHandler"
+            id="KParserBenchmark.saveCommand"
+            name="Save">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -119,6 +149,12 @@
                   label="Exit"
                   style="push"
                   tooltip="Exit application">
+            </command>
+            <command
+                  commandId="KParserBenchmark.saveCommand"
+                  label="Save"
+                  style="push"
+                  tooltip="Save file">
             </command>
          </menu>
          <menu

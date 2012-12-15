@@ -1,8 +1,22 @@
+/*******************************************************************************
+ Copyright (c) 2012 kopson kopson.piko@gmail.com
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ *******************************************************************************/
+
 package kparserbenchmark.commands;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import kparserbenchmark.KFile;
 import kparserbenchmark.KImage;
@@ -50,13 +64,11 @@ public class SetWorkspaceHandler implements IHandler {
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -116,8 +128,7 @@ public class SetWorkspaceHandler implements IHandler {
 		private Label warning;
 		private Image image;
 
-		// Save date because all components are disposed after Dialog.open()
-		// returns
+		// Save return data because all components are disposed after Dialog.open()
 		private String name;
 		private boolean checked;
 
@@ -146,7 +157,6 @@ public class SetWorkspaceHandler implements IHandler {
 					IDialogConstants.OK_LABEL, true);
 			createButton(parent, IDialogConstants.CANCEL_ID,
 					IDialogConstants.CANCEL_LABEL, false);
-
 		}
 
 		@Override
@@ -215,7 +225,7 @@ public class SetWorkspaceHandler implements IHandler {
 						if (KFile.isPathVaild(dir)) {
 							nameText.setText(dir);
 							txtDecorator.hide();
-							checkWarning();
+								checkWarning();
 							okButton.setEnabled(true);
 						} else {
 							txtDecorator.show();
@@ -237,6 +247,7 @@ public class SetWorkspaceHandler implements IHandler {
 				image = new Image(Display.getDefault(), Display.getDefault()
 						.getSystemImage(SWT.ICON_WARNING), SWT.IMAGE_COPY);
 
+			//TODO: Change warning button with directly drawn image
 			warningButton = new Button(subContainer, SWT.PUSH);
 			if (!image.isDisposed()) {
 				image = KImage.resize(image,
@@ -265,24 +276,14 @@ public class SetWorkspaceHandler implements IHandler {
 			return container;
 		}
 
+		//Check if warning button should be displayed
 		private void checkWarning() {
-			File oldWorkspace = new File(Application.getDefaultWorkspace());
-
-			try {
-				if (checkButton.getSelection()
-						&& oldWorkspace.isDirectory()
-						&& oldWorkspace.list().length > 0
-						&& !oldWorkspace.getCanonicalPath().equals(
-								nameText.getText())) {
-					warning.setVisible(true);
-					warningButton.setVisible(true);
-				} else {
-					warning.setVisible(false);
-					warningButton.setVisible(false);
-				}
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			if(checkButton.getSelection() && KFile.checkWorkspaceNotEmpty(nameText.getText())) {
+				warning.setVisible(true);
+				warningButton.setVisible(true);
+			} else {
+				warning.setVisible(false);
+				warningButton.setVisible(false);
 			}
 		}
 		

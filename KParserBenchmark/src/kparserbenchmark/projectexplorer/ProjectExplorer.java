@@ -2,8 +2,11 @@ package kparserbenchmark.projectexplorer;
 
 import kparserbenchmark.commands.OpenProjectAction;
 import kparserbenchmark.commands.RefreshProjectAction;
+import kparserbenchmark.commands.ScriptEditorAction;
 import kparserbenchmark.projectexplorer.Project.Status;
 
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -17,6 +20,7 @@ import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -40,16 +44,17 @@ public class ProjectExplorer extends ViewPart {
 		public ProjectTreeViewer(Composite parent, int i) {
 			super(parent, i);
 		}
-		
+
 		@Override
 		protected void handleTreeExpand(TreeEvent event) {
 			Object o = event.item.getData();
-			if(o instanceof Project && ((Project) o).getCurrStatus() == Status.OPENED)
+			if (o instanceof Project
+					&& ((Project) o).getCurrStatus() == Status.OPENED)
 				super.handleTreeExpand(event);
 		}
-		
+
 	}
-	
+
 	// View ID
 	public static final String ID = "KParserBenchmark.projectExplorer";
 
@@ -64,13 +69,47 @@ public class ProjectExplorer extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		viewer = new ProjectTreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+		viewer = new ProjectTreeViewer(parent, SWT.MULTI | SWT.H_SCROLL
+				| SWT.V_SCROLL);
 		viewer.setContentProvider(new ProjectContentProvider());
 		viewer.setLabelProvider(new ProjectLabelProvider());
 		// Expand the tree
 		viewer.setAutoExpandLevel(1);
 		// Provide the input to the ContentProvider
 		viewer.setInput(new ProjectModel());
+
+		// Get some actions from main menu and add them to context menu
+		IWorkbenchWindow window = getSite().getPage()
+				.getWorkbenchWindow();
+		final IWorkbenchAction runEditorAction = new ScriptEditorAction(window);
+		final OpenProjectAction openProjectAction = new OpenProjectAction(window);
+		final RefreshProjectAction refreshProjectAction = new RefreshProjectAction(window);
+		
+		// Create new context menu for tree viewer
+		MenuManager menuManager = new MenuManager();
+		viewer.getControl().setMenu(
+				menuManager.createContextMenu(viewer.getControl()));
+		getSite().registerContextMenu(menuManager, viewer);
+		getSite().setSelectionProvider(viewer);
+
+		menuManager.setRemoveAllWhenShown(true);
+		menuManager.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager manager) {
+				final IStructuredSelection selection = (IStructuredSelection) viewer
+						.getSelection();
+				if (!selection.isEmpty()) {
+					if (selection.getFirstElement() instanceof Project) {
+						manager.add(openProjectAction);
+						manager.add(refreshProjectAction);
+						manager.add(new Separator(
+								IWorkbenchActionConstants.MB_ADDITIONS));
+					} else if (selection.getFirstElement() instanceof Category) {
+						manager.add(runEditorAction);
+						manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+					}
+				}
+			}
+		});
 
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 
@@ -80,8 +119,14 @@ public class ProjectExplorer extends ViewPart {
 				IStructuredSelection thisSelection = (IStructuredSelection) event
 						.getSelection();
 				Object selectedNode = thisSelection.getFirstElement();
-				viewer.setExpandedState(selectedNode,
-						!viewer.getExpandedState(selectedNode));
+
+				if (selectedNode instanceof Project) {
+					viewer.setExpandedState(selectedNode,
+							!viewer.getExpandedState(selectedNode));
+				} else if (selectedNode instanceof Category) {
+					if (runEditorAction.isEnabled())
+						runEditorAction.run();
+				}
 			}
 		});
 
@@ -99,19 +144,6 @@ public class ProjectExplorer extends ViewPart {
 				}
 			}
 		});
-
-		// Create new context menu for tree viewer
-		MenuManager menuManager = new MenuManager();
-		menuManager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		viewer.getControl().setMenu(
-				menuManager.createContextMenu(viewer.getControl()));
-		getSite().registerContextMenu(menuManager, viewer);
-		getSite().setSelectionProvider(viewer);
-
-		// Get some actions from main menu and add them to context menu
-		IWorkbenchWindow window = getSite().getPage().getWorkbenchWindow();
-		menuManager.add(new OpenProjectAction(window));
-		menuManager.add(new RefreshProjectAction(window));
 	}
 
 	@Override
@@ -129,6 +161,7 @@ public class ProjectExplorer extends ViewPart {
 			viewer.refresh();
 		}
 	}
+
 	/**
 	 * Refresh tree view element
 	 * 
@@ -144,5 +177,5 @@ public class ProjectExplorer extends ViewPart {
 			viewer.setExpandedState(p, exp);
 		}
 	}
-	
+
 }
