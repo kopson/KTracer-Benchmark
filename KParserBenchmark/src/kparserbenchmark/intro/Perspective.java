@@ -14,7 +14,5 @@ public class Perspective implements IPerspectiveFactory {
 	public void createInitialLayout(IPageLayout layout) {
 		layout.setEditorAreaVisible(true);
 		layout.setFixed(false);
-	    //layout.addView(ProjectExplorer.ID, IPageLayout.LEFT, 0.5f, layout.getEditorArea());
-	    //layout.addView(FileBrowser.ID, IPageLayout.RIGHT, 0.5f, ProjectExplorer.ID);
 	}
 }

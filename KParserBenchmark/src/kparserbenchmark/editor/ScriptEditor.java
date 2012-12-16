@@ -16,6 +16,8 @@
 
 package kparserbenchmark.editor;
 
+import kparserbenchmark.KFile;
+import kparserbenchmark.KWindow;
 import kparserbenchmark.projectexplorer.Category;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,7 +38,7 @@ import org.eclipse.ui.part.EditorPart;
  * Script editor class.
  * 
  * @author kopson
- *
+ * 
  */
 public class ScriptEditor extends EditorPart {
 
@@ -49,35 +51,47 @@ public class ScriptEditor extends EditorPart {
 	 * Editor body.
 	 */
 	private Text transcript;
-	
-	//Editor input file
+
+	// Editor input file
 	private Category inputFile;
 
-	//Is file dirty
+	// Is file dirty
 	boolean dirty;
-	
-	@Override
-	public void doSave(IProgressMonitor monitor) {
+
+	/**
+	 * Used to save file in doSave() and doSaveAs() actions
+	 * 
+	 * @param path
+	 *            File path to save
+	 */
+	private void save(String path) {
+		KFile f = new KFile(path);
+		f.clear();
+		f.setText(transcript.getText());
 		dirty = false;
 		firePropertyChange(ISaveablePart.PROP_DIRTY);
-		System.out.println("Saved");
+	}
+
+	@Override
+	public void doSave(IProgressMonitor monitor) {
+		save(inputFile.getPath());
 	}
 
 	@Override
 	public void doSaveAs() {
-		dirty = false;
-		firePropertyChange(ISaveablePart.PROP_DIRTY);
-		System.out.println("Saved as");
+		String file = KWindow.openFileDialog(inputFile.getPath(), KWindow.ALL);
+		if (file != null)
+			save(file);
 	}
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
-		throws PartInitException {
+			throws PartInitException {
 		setSite(site);
 		setInput(input);
 		setPartName(getScriptEditorName());
-		inputFile = ((ScriptEditorInput) input).getCategory();
 		dirty = false;
+		inputFile = ((ScriptEditorInput) input).getCategory();
 	}
 
 	@Override
@@ -97,17 +111,17 @@ public class ScriptEditor extends EditorPart {
 		layout.marginWidth = 0;
 		layout.marginHeight = 0;
 		top.setLayout(layout);
-		
+
 		transcript = new Text(top, SWT.BORDER | SWT.MULTI | SWT.WRAP);
-		transcript.setLayoutData(new GridData(
-			GridData.FILL, GridData.FILL, true, true));
+		transcript.setLayoutData(new GridData(GridData.FILL, GridData.FILL,
+				true, true));
 		transcript.setEditable(true);
 		transcript.setBackground(transcript.getDisplay().getSystemColor(
-			SWT.COLOR_WHITE));
+				SWT.COLOR_WHITE));
 		transcript.setForeground(transcript.getDisplay().getSystemColor(
-			SWT.COLOR_BLACK));
+				SWT.COLOR_BLACK));
 		transcript.addKeyListener(new KeyAdapter() {
-			
+
 			@Override
 			public void keyReleased(KeyEvent event) {
 				super.keyReleased(event);
@@ -117,10 +131,10 @@ public class ScriptEditor extends EditorPart {
 			@Override
 			public void keyPressed(KeyEvent event) {
 				super.keyPressed(event);
-				setDirty();
+				// setDirty();
 			}
 		});
-		
+
 		transcript.setText(inputFile.getText());
 	}
 
@@ -139,12 +153,12 @@ public class ScriptEditor extends EditorPart {
 	private String getScriptEditorName() {
 		return ((ScriptEditorInput) getEditorInput()).getName();
 	}
-	
+
 	/**
 	 * Marks this file for save method
 	 */
 	private void setDirty() {
-		firePropertyChange(ISaveablePart.PROP_DIRTY); 
 		dirty = true;
+		firePropertyChange(ISaveablePart.PROP_DIRTY);
 	}
 }

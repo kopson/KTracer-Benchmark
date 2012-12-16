@@ -7,9 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import kparserbenchmark.KFile;
-
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.PlatformUI;
+import kparserbenchmark.KWindow;
 
 /**
  * Controls life cycle of the project
@@ -109,7 +107,7 @@ public class Project {
 	public boolean open() {
 		assert (currStatus == Status.CLOSED);
 		currStatus = Status.OPENED;
-		if(propFile == null) {
+		if (propFile == null) {
 			String projPath = path + File.separator + name;
 			propFile = new KFile(projPath + File.separator + properties);
 		}
@@ -124,7 +122,7 @@ public class Project {
 	public boolean close() {
 		assert (currStatus == Status.OPENED);
 		currStatus = Status.CLOSED;
-		if(propFile == null) {
+		if (propFile == null) {
 			String projPath = path + File.separator + name;
 			propFile = new KFile(projPath + File.separator + properties);
 		}
@@ -142,13 +140,11 @@ public class Project {
 		propFile = new KFile(projPath + File.separator + properties);
 		File projDir = new File(projPath);
 		if (propFile.exists()) {
-			MessageDialog.openError(PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getShell(), "Error", errorDup);
+			KWindow.displayError(errorDup);
 			return false;
 		}
 		if (projDir.exists() && projDir.isDirectory()) {
-			MessageDialog.openError(PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getShell(), "Error", errorDup);
+			KWindow.displayError(errorDup);
 			return false;
 		}
 
@@ -157,9 +153,7 @@ public class Project {
 
 		try {
 			if (!propFile.createNewFile() || !propFile.canWrite()) {
-				MessageDialog.openError(PlatformUI.getWorkbench()
-						.getActiveWorkbenchWindow().getShell(), "Error",
-						errorCreat);
+				KWindow.displayError(errorCreat);
 				return false;
 			}
 		} catch (IOException e) {
@@ -212,22 +206,26 @@ public class Project {
 	 * 
 	 * @param absolutePath
 	 * @return
+	 * @throws ProjectException
 	 */
-	public boolean init(String absolutePath) {
-		String propFile = absolutePath + File.separator + properties;
-		KFile properties = new KFile(propFile);
-		if (properties.exists()) {
-			name = properties.readProperty(Properties.Name);
-			path = properties.readProperty(Properties.Path);
-			summary = properties.readProperty(Properties.Summary);
-			description = properties.readProperty(Properties.Description);
-			currStatus = Status.valueOf(properties
-					.readProperty(Properties.State));
-			type = Types.valueOf(properties.readProperty(Properties.Type));
-		} else {
-			return false;
+	public boolean init(String absolutePath) throws ProjectException {
+		try {
+			String propFile = absolutePath + File.separator + properties;
+			KFile properties = new KFile(propFile);
+			if (properties.exists()) {
+				name = properties.readProperty(Properties.Name);
+				path = properties.readProperty(Properties.Path);
+				summary = properties.readProperty(Properties.Summary);
+				description = properties.readProperty(Properties.Description);
+				currStatus = Status.valueOf(properties
+						.readProperty(Properties.State));
+				type = Types.valueOf(properties.readProperty(Properties.Type));
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			throw new ProjectException(e);
 		}
-
 		return true;
 	}
 

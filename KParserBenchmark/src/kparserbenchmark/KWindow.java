@@ -16,12 +16,20 @@
 
 package kparserbenchmark;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import kparserbenchmark.editor.ScriptEditor;
 import kparserbenchmark.editor.ScriptEditorInput;
 import kparserbenchmark.projectexplorer.Category;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -37,6 +45,19 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class KWindow {
 
+	// String constants
+	private static final String fileDialogTitle = "Select File";
+	private static final String pathDialogTitle = "Select directory";
+	private static final String pathDialogDescription = "Select directory";
+
+	// Logger instance
+	private static final Logger LOG = Logger.getLogger(KWindow.class.getName());
+	
+	/** Set *.txt file extensions */
+	public static final int TXT = 0x000F;
+	/** Set all file extensions */
+	public static final int ALL = 0xFFFF;
+	
 	/**
 	 * This class should be never instantiate
 	 */
@@ -46,52 +67,61 @@ public class KWindow {
 	/**
 	 * Get workbench page in view
 	 * 
-	 * @param view View
+	 * @param view
+	 *            View
 	 * @return Returns workbench page
 	 */
 	public static IWorkbenchPage getPage(ViewPart view) {
 		return view.getViewSite().getPage();
 	}
-	
+
 	/**
 	 * Get workbench page in command
 	 * 
-	 * @param event Command's execution event
+	 * @param event
+	 *            Command's execution event
 	 * @return Returns workbench page
 	 */
 	public static IWorkbenchPage getPage(ExecutionEvent event) {
 		return HandlerUtil.getActiveWorkbenchWindow(event).getActivePage();
 	}
-	
+
 	/**
 	 * Get workbench page from anyplace
 	 * 
 	 * @return Returns workbench page
 	 */
 	public static IWorkbenchPage getPage() {
-		return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(); 
+		return PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+				.getActivePage();
 	}
-	
+
 	/**
 	 * Open script editor for file
 	 * 
-	 * @param page Where to open editor 
-	 * @param participant File input
+	 * @param page
+	 *            Where to open editor
+	 * @param participant
+	 *            File input
 	 * @return Returns opened editor
 	 */
-	public static IEditorPart openEditor(IWorkbenchPage page, Category participant) {
+	public static IEditorPart openEditor(IWorkbenchPage page,
+			Category participant) {
 		try {
-			return page.openEditor(new ScriptEditorInput(participant), ScriptEditor.ID);
+			return page.openEditor(new ScriptEditorInput(participant),
+					ScriptEditor.ID);
 		} catch (PartInitException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
 		return null;
 	}
+
 	/**
 	 * Get view by ID
 	 * 
-	 * @param viewID View ID
+	 * @param viewID
+	 *            View ID
 	 * @return Returns the view or NULL if view is not found
 	 */
 	public static IViewPart getView(String viewID) {
@@ -104,10 +134,69 @@ public class KWindow {
 	 * Get status line from a view. Use this function to change status line<br>
 	 * message.
 	 * 
-	 * @param view Workbench View 
+	 * @param view
+	 *            Workbench View
 	 * @return Returns status line manager
 	 */
 	public static IStatusLineManager getStatusLine(IViewPart view) {
-		return view.getViewSite().getActionBars().getStatusLineManager(); 
+		return view.getViewSite().getActionBars().getStatusLineManager();
+	}
+
+	/**
+	 * Display error dialog
+	 * 
+	 * @param errorMsg
+	 *            Error message
+	 */
+	public static void displayError(String errorMsg) {
+		MessageDialog.openError(PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getShell(), "Error", errorMsg);
+		LOG.log(Level.SEVERE, errorMsg);
+	}
+
+	/**
+	 * Open directory dialog
+	 * 
+	 * @param filter
+	 *            Starting directory
+	 * @return Returns path to selected directory
+	 */
+	public static String openDirectoryDialog(String filter) {
+		DirectoryDialog dlg = new DirectoryDialog(PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getShell());
+		dlg.setFilterPath(filter);
+
+		dlg.setText(pathDialogTitle);
+		dlg.setMessage(pathDialogDescription);
+		return dlg.open();
+	}
+
+	/**
+	 * Open file dialog
+	 * 
+	 * @param filter
+	 *            Starting directory
+	 * @return Returns path to selected file
+	 */
+	public static String openFileDialog(String filter, int ext) {
+		FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getShell());
+		fileDialog.setFilterPath(filter);
+		fileDialog.setText(fileDialogTitle);
+		List<String> extentions = new ArrayList<String>();
+		List<String> extentionNames = new ArrayList<String>();
+		
+		if(ext == ALL) {
+			extentions.add("*.*");
+			extentionNames.add("Allfiles");
+		}
+		
+		if((ext & TXT) == 1) {
+			extentions.add("*.txt");
+			extentionNames.add("Textfiles(*.txt)");
+		}
+		fileDialog.setFilterExtensions(extentions.toArray(new String[extentions.size()]));
+		fileDialog.setFilterNames(extentionNames.toArray(new String[extentionNames.size()]));
+		return fileDialog.open();
 	}
 }

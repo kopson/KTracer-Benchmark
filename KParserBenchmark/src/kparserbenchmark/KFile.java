@@ -21,6 +21,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -107,11 +108,11 @@ public class KFile extends File {
 					out.close();
 					return true;
 				} catch (FileNotFoundException e) {
-					e.printStackTrace();
+					KWindow.displayError(e.getMessage());
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			KWindow.displayError(e.getMessage());
 		}
 		return false;
 	}
@@ -141,12 +142,28 @@ public class KFile extends File {
 			}
 			in.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			KWindow.displayError(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			KWindow.displayError(e.getMessage());
 		}
 
 		return null;
+	}
+
+	/**
+	 * Save text to file
+	 * 
+	 * @param text Text to save
+	 */
+	public void setText(String text) {
+		BufferedWriter out;
+		try {
+			out = new BufferedWriter(new FileWriter(this, true));
+			out.write(text);
+			out.close();
+		} catch (IOException e) {
+			KWindow.displayError(e.getMessage());
+		}
 	}
 
 	/**
@@ -171,9 +188,9 @@ public class KFile extends File {
 			}
 			in.close();
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			KWindow.displayError(e.getMessage());
 		} catch (IOException e) {
-			e.printStackTrace();
+			KWindow.displayError(e.getMessage());
 		}
 
 		return stringBuilder.toString();
@@ -264,9 +281,18 @@ public class KFile extends File {
 				return false;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			KWindow.displayError(e.getMessage());
 		}
 		return false;
+	}
+
+	public void clear() {
+		try {
+			FileOutputStream writer = new FileOutputStream(this);
+			writer.write((new String()).getBytes());
+			writer.close();
+		} catch (IOException e) {
+			KWindow.displayError(e.getMessage());
+		}
 	}
 }

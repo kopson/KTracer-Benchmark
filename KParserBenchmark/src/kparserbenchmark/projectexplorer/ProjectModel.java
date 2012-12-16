@@ -3,6 +3,8 @@ package kparserbenchmark.projectexplorer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import kparserbenchmark.intro.Application;
 
@@ -13,6 +15,10 @@ import kparserbenchmark.intro.Application;
  */
 public class ProjectModel {
 
+	// Logger instance
+	private final static Logger LOG = Logger.getLogger(ProjectModel.class
+			.getName());
+	
 	// List of projects
 	private List<Project> projects;
 
@@ -29,15 +35,19 @@ public class ProjectModel {
 		if (f.isDirectory()) {
 			for (File c : f.listFiles()) {
 				if (c.isDirectory()) {
-					Project project = new Project();
-					project.init(c.getAbsolutePath());
-					if (project.getCurrStatus() == Project.Status.OPENED) {
-						for (File c1 : c.listFiles()) {
-							Category file = new Category(project, c1.getAbsolutePath(), c1.getName());
-							project.getElements().add(file);
+					try {
+						Project project = new Project();
+						project.init(c.getAbsolutePath());
+						if (project.getCurrStatus() == Project.Status.OPENED) {
+							for (File c1 : c.listFiles()) {
+								Category file = new Category(project, c1.getAbsolutePath(), c1.getName());
+								project.getElements().add(file);
+							}
 						}
+						projects.add(project);
+					} catch (ProjectException e) {
+						LOG.log(Level.WARNING, e.getMessage());
 					}
-					projects.add(project);
 				}
 			}
 		}

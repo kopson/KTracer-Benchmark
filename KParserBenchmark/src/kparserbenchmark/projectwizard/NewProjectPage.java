@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import kparserbenchmark.KTrace;
+import kparserbenchmark.KWindow;
 import kparserbenchmark.intro.Application;
 import kparserbenchmark.projectexplorer.Project;
 
@@ -22,7 +23,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
@@ -62,8 +62,6 @@ public class NewProjectPage extends WizardPage {
 	private static final String defaultPathLabel = "Select default location";
 	private static final String descriptionLabel = "Project description: ";
 	private static final String summaryLabel = "Project summary: ";
-	private static final String pathDialogTitle = "Set project path";
-	private static final String pathDialogDescription = "Select project directory";
 	private static final String projectNameValidator = "Please use only letters and digits";
 	private static final String projectNameDupVal = "Project with this name already exists";
 	
@@ -189,16 +187,7 @@ public class NewProjectPage extends WizardPage {
 		button.setText("Browse...");
 		button.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				DirectoryDialog dlg = new DirectoryDialog(getShell());
-
-				// Set the initial filter path according
-				// to anything they've selected or typed in
-				dlg.setFilterPath(projectPath.getText());
-
-				dlg.setText(pathDialogTitle);
-				dlg.setMessage(pathDialogDescription);
-
-				String dir = dlg.open();
+				String dir = KWindow.openDirectoryDialog(projectPath.getText());
 				if (dir != null) {
 					projectPath.setText(dir);
 				}

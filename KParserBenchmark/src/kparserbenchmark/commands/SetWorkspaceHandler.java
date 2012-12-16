@@ -20,6 +20,7 @@ import java.io.FileNotFoundException;
 
 import kparserbenchmark.KFile;
 import kparserbenchmark.KImage;
+import kparserbenchmark.KWindow;
 import kparserbenchmark.intro.Application;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -43,12 +44,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * Action to change default workspace
@@ -56,10 +55,6 @@ import org.eclipse.ui.PlatformUI;
  * @author kopson
  */
 public class SetWorkspaceHandler implements IHandler {
-
-	// String constants
-	public static final String pathDialogTitle = "Set workspace";
-	public static final String pathDialogDescription = "Set new default workspace";
 
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
@@ -212,15 +207,8 @@ public class SetWorkspaceHandler implements IHandler {
 			button.addSelectionListener(new SelectionAdapter() {
 				@Override
 				public void widgetSelected(SelectionEvent e) {
-					DirectoryDialog dlg = new DirectoryDialog(PlatformUI
-							.getWorkbench().getActiveWorkbenchWindow()
-							.getShell());
-					dlg.setFilterPath(nameText.getText());
-
-					dlg.setText(pathDialogTitle);
-					dlg.setMessage(pathDialogDescription);
-
-					String dir = dlg.open();
+					String dir = KWindow.openDirectoryDialog(nameText.getText());
+					
 					if (dir != null) {
 						if (KFile.isPathVaild(dir)) {
 							nameText.setText(dir);

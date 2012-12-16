@@ -130,6 +130,11 @@
             id="KParserBenchmark.saveCommand"
             name="Save">
       </command>
+      <command
+            defaultHandler="org.eclipse.ui.internal.handlers.SaveAsHandler"
+            id="KParserBenchmark.saveAsCommand"
+            name="Save As">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -140,21 +145,25 @@
                id="KParserBenchmark.fileMenu"
                label="File">
             <command
-                  commandId="KParserBenchmark.newProjectCommand"
-                  label="New Project"
+                  commandId="KParserBenchmark.saveCommand"
+                  label="Save"
+                  style="push"
+                  tooltip="Save file">
+            </command>
+            <command
+                  commandId="KParserBenchmark.saveAsCommand"
+                  label="Save As"
                   style="push">
             </command>
+            <separator
+                  name="KParserBenchmark.separator"
+                  visible="true">
+            </separator>
             <command
                   commandId="KParserBenchmark.exitCommand"
                   label="Exit"
                   style="push"
                   tooltip="Exit application">
-            </command>
-            <command
-                  commandId="KParserBenchmark.saveCommand"
-                  label="Save"
-                  style="push"
-                  tooltip="Save file">
             </command>
          </menu>
          <menu
@@ -163,6 +172,11 @@
             <command
                   commandId="KParserBenchmark.SetWorkspaceCommand"
                   label="Set workspace"
+                  style="push">
+            </command>
+            <command
+                  commandId="KParserBenchmark.newProjectCommand"
+                  label="New Project"
                   style="push">
             </command>
          </menu>
