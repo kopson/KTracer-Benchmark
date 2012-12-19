@@ -21,7 +21,7 @@ import java.io.FileNotFoundException;
 import kparserbenchmark.KFile;
 import kparserbenchmark.KImage;
 import kparserbenchmark.KWindow;
-import kparserbenchmark.intro.Application;
+import kparserbenchmark.projectexplorer.Workspace;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -71,7 +71,7 @@ public class SetWorkspaceHandler implements IHandler {
 		Shell s = Display.getCurrent().getActiveShell();
 		OKCancelDialog dialog = new OKCancelDialog(s);
 
-		String oldWorkspace = Application.getDefaultWorkspace();
+		String oldWorkspace = Workspace.getInstance().getPath();
 		if (dialog.open() == Window.OK) {
 			String newWorkspace = dialog.getNewWorkspace();
 			if (!newWorkspace.equals(oldWorkspace)) {
@@ -83,8 +83,7 @@ public class SetWorkspaceHandler implements IHandler {
 						e.printStackTrace();
 					}
 				}
-				Application.setDefaultWorkspace(newWorkspace);
-				Application.createDefaultWorkspace();
+				Workspace.getInstance().createDefaultWorkspace(newWorkspace);
 			}
 		}
 		return null;
@@ -178,7 +177,7 @@ public class SetWorkspaceHandler implements IHandler {
 			// hiding it initially
 			txtDecorator.hide();
 
-			nameText.setText(Application.getDefaultWorkspace());
+			nameText.setText(Workspace.getInstance().getPath());
 			name = nameText.getText();
 			nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			nameText.addKeyListener(new KeyListener() {

@@ -3,6 +3,7 @@ package kparserbenchmark.intro;
 import java.io.File;
 
 import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.Workspace;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -16,9 +17,6 @@ import org.eclipse.ui.PlatformUI;
  * @author kopson
  */
 public class Application implements IApplication {
-
-	//Default workspace location
-	private static String defaultWorkspace = "";
 	
 	//Current active project
 	private static Project currProject;
@@ -28,8 +26,7 @@ public class Application implements IApplication {
 	
 	@Override
 	public Object start(IApplicationContext context) {
-		defaultWorkspace = System.getProperty("user.home") + File.separator + KWorkspace;
-		createDefaultWorkspace();
+		Workspace.getInstance().createDefaultWorkspace(System.getProperty("user.home") + File.separator + KWorkspace);
 		
 		Display display = PlatformUI.createDisplay();
 		try {
@@ -55,23 +52,6 @@ public class Application implements IApplication {
 					workbench.close();
 			}
 		});
-	}
-	
-	/**
-	 * Sets application's projects default location
-	 */
-	public static void createDefaultWorkspace() {
-		File f = new File(defaultWorkspace);
-		if (!f.exists())
-			f.mkdir();
-	}
-	
-	public static void setDefaultWorkspace(String workspace) {
-		defaultWorkspace = workspace;
-	}
-	
-	public static String getDefaultWorkspace() {
-		return defaultWorkspace;
 	}
 
 	public static Project getCurrProject() {

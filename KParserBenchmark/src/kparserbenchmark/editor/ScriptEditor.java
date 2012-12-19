@@ -16,9 +16,12 @@
 
 package kparserbenchmark.editor;
 
+import java.io.File;
+
 import kparserbenchmark.KFile;
 import kparserbenchmark.KWindow;
 import kparserbenchmark.projectexplorer.Category;
+import kparserbenchmark.projectexplorer.Workspace;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
@@ -29,6 +32,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.PartInitException;
@@ -79,9 +83,19 @@ public class ScriptEditor extends EditorPart {
 
 	@Override
 	public void doSaveAs() {
-		String file = KWindow.openFileDialog(inputFile.getPath(), KWindow.ALL);
-		if (file != null)
+		String startingPath = inputFile.getParentPath();
+		if (startingPath == null)
+			startingPath = Workspace.getInstance().getPath();
+		String file = KWindow.saveFileDialog(startingPath, inputFile.getName(),
+				KWindow.ALL);
+		if (file != null) {
+			inputFile = new Category(null, file, new File(file).getName());
+			setInputWithNotify(new ScriptEditorInput(inputFile));
+			setPartName(inputFile.getName());
+			firePropertyChange(IEditorPart.PROP_INPUT);
+			firePropertyChange(IEditorPart.PROP_TITLE);
 			save(file);
+		}
 	}
 
 	@Override

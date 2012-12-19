@@ -43,15 +43,23 @@ public class KImage {
 	public static final String IMG_PROJECT_OPENED = "/icons/open_24.png";
 	public static final String IMG_PROJECT_CLOSED = "/icons/box_24.png";
 	public static final String IMG_PROJECT_FILE = "/icons/document_24.png";
-	public static final String IMG_OK_STATUS = "/icons/tick_16.png";
-	public static final String IMG_ERR_STATUS = "/icons/cross_16.png";
-	public static final String IMG_CANCEL_STATUS = "/icons/delete_16.png";
 	public static final String IMG_SCRIPT_EDITOR = "icons/pencil_16.png";
 	
-	//Resource images
+	//Image icons for status line
+	public static final String IMG_INFO_STATUS = "/icons/status/info_16.png";
+	public static final String IMG_NEW_STATUS = "/icons/status/add_16.png";
+	public static final String IMG_OK_STATUS = "/icons/status/tick_16.png";
+	public static final String IMG_ERR_STATUS = "/icons/status/cross_16.png";
+	public static final String IMG_CANCEL_STATUS = "/icons/status/delete_16.png";
+	public static final String IMG_WARNING_STATUS = "/icons/status/alert_16.png";
+	
+	//Resource images for status line are pre-created to avoid memory leaks
+	private static Image infoStatusImage = getImageDescriptor(IMG_INFO_STATUS).createImage();
+	private static Image newStatusImage =  getImageDescriptor(IMG_NEW_STATUS).createImage();
 	private static Image okStatusImage = getImageDescriptor(IMG_OK_STATUS).createImage();
 	private static Image errStatusImage =  getImageDescriptor(IMG_ERR_STATUS).createImage();
 	private static Image cancelStatusImage =  getImageDescriptor(IMG_CANCEL_STATUS).createImage();
+	private static Image warningStatusImage =  getImageDescriptor(IMG_WARNING_STATUS).createImage();
 	
 	/**
 	 * This class should be never instantiate
@@ -167,6 +175,12 @@ public class KImage {
 			return errStatusImage;
 		else if (img.equals(IMG_CANCEL_STATUS))
 			return cancelStatusImage;
+		else if (img.equals(IMG_INFO_STATUS))
+			return infoStatusImage;
+		else if (img.equals(IMG_NEW_STATUS))
+			return newStatusImage;
+		else if (img.equals(IMG_WARNING_STATUS))
+			return warningStatusImage;
 		else
 			return null;
 	}

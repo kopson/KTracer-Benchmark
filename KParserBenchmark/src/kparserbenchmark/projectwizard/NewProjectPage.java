@@ -6,8 +6,8 @@ import java.util.regex.Pattern;
 
 import kparserbenchmark.KTrace;
 import kparserbenchmark.KWindow;
-import kparserbenchmark.intro.Application;
 import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.Workspace;
 
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
@@ -164,7 +164,7 @@ public class NewProjectPage extends WizardPage {
 		
 		Composite subContainer = new Composite(container, SWT.NULL);
 		projectPath = new Text(subContainer, SWT.BORDER | SWT.SINGLE);
-		projectPath.setText(Application.getDefaultWorkspace());
+		projectPath.setText(Workspace.getInstance().getPath());
 		projectPath.setEnabled(false);
 		
 		checkButton.setSelection(true);

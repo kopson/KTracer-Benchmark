@@ -18,10 +18,38 @@
       <product
             application="KParserBenchmark.application"
             description="KTracer Benchmark Tool"
-            name="KTracer">
+            name="KTracer Benchmark">
          <property
                name="windowImages"
-               value="icons/alt_window_16.gif,icons/alt_window_32.gif">
+               value="icons/splash_icon_16.png,icons/splash_icon_32.png,icons/splash_icon_32.png,icons/splash_icon_64.png,icons/splash_icon_128.png">
+         </property>
+         <property
+               name="appName"
+               value="KTracer Benchmark">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/splash_icon_128.png">
+         </property>
+         <property
+               name="aboutText"
+               value="%Copyright (c) 2012 kopson kopson.piko@gmail.com&#x0A;&#x0A;Licensed under the Apache License, Version 2.0">
+         </property>
+         <property
+               name="startupForegroundColor"
+               value="000000">
+         </property>
+         <property
+               name="startupMessageRect"
+               value="7,252,445,20">
+         </property>
+         <property
+               name="startupProgressRect"
+               value="5,275,444,15">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
          </property>
       </product>
    </extension>
@@ -118,7 +146,7 @@
       <command
             defaultHandler="kparserbenchmark.commands.SetWorkspaceHandler"
             id="KParserBenchmark.SetWorkspaceCommand"
-            name="SetWorkspace">
+            name="Set Workspace">
       </command>
       <command
             defaultHandler="org.eclipse.ui.internal.about.AboutHandler"
@@ -135,6 +163,11 @@
             id="KParserBenchmark.saveAsCommand"
             name="Save As">
       </command>
+      <command
+            defaultHandler="kparserbenchmark.commands.OpenFileHandler"
+            id="KParserBenchmark.openFileCommand"
+            name="Open File">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -144,6 +177,11 @@
          <menu
                id="KParserBenchmark.fileMenu"
                label="File">
+            <command
+                  commandId="KParserBenchmark.openFileCommand"
+                  label="Open"
+                  style="push">
+            </command>
             <command
                   commandId="KParserBenchmark.saveCommand"
                   label="Save"

@@ -41,15 +41,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setShowCoolBar(false);
         configurer.setShowStatusLine(true);
         configurer.setShowMenuBar(true);
-        configurer.setTitle("KTracer");
+        //configurer.setTitle("KTracer");
     }
     
     @Override
     public void postWindowOpen() {
     	statusImage = KImage.getImageDescriptor(KImage.IMG_OK_STATUS).createImage();
-		IStatusLineManager statusline = getWindowConfigurer()
+		/*IStatusLineManager statusline = getWindowConfigurer()
 				.getActionBarConfigurer().getStatusLineManager();
-		statusline.setMessage(statusImage, "KParserBenchmark started");
+		statusline.setMessage(statusImage, "KParserBenchmark started");*/
 	}
     
     @Override

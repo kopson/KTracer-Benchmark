@@ -28,6 +28,7 @@ import kparserbenchmark.projectexplorer.Category;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.IEditorPart;
@@ -52,12 +53,12 @@ public class KWindow {
 
 	// Logger instance
 	private static final Logger LOG = Logger.getLogger(KWindow.class.getName());
-	
+
 	/** Set *.txt file extensions */
 	public static final int TXT = 0x000F;
 	/** Set all file extensions */
 	public static final int ALL = 0xFFFF;
-	
+
 	/**
 	 * This class should be never instantiate
 	 */
@@ -111,8 +112,8 @@ public class KWindow {
 			return page.openEditor(new ScriptEditorInput(participant),
 					ScriptEditor.ID);
 		} catch (PartInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
 		}
 		return null;
 	}
@@ -151,7 +152,6 @@ public class KWindow {
 	public static void displayError(String errorMsg) {
 		MessageDialog.openError(PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getShell(), "Error", errorMsg);
-		LOG.log(Level.SEVERE, errorMsg);
 	}
 
 	/**
@@ -172,31 +172,75 @@ public class KWindow {
 	}
 
 	/**
+	 * Create new Open or Save As... file dialog
+	 * 
+	 * @param filter
+	 *            Starting directory
+	 * @param name
+	 *            Name of the file to save. If name is null create Open dialog
+	 *            otherwise create Save As... dialog
+	 * @param ext
+	 *            File extension types as defined in KWindow
+	 * @return Returns path to selected file
+	 */
+	private static String fileDialog(String filter, String name, int ext) {
+		int dialogFlags = 0;
+		if (name != null)
+			dialogFlags = SWT.SAVE;
+		else
+			dialogFlags = SWT.OPEN;
+
+		FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getShell(), dialogFlags);
+		fileDialog.setFilterPath(filter);
+		fileDialog.setText(fileDialogTitle);
+		if (name != null)
+			fileDialog.setFileName(name);
+
+		List<String> extentions = new ArrayList<String>();
+		List<String> extentionNames = new ArrayList<String>();
+
+		if (ext == ALL) {
+			extentions.add("*.*");
+			extentionNames.add("Allfiles");
+		}
+
+		if ((ext & TXT) == 1) {
+			extentions.add("*.txt");
+			extentionNames.add("Textfiles(*.txt)");
+		}
+		fileDialog.setFilterExtensions(extentions.toArray(new String[extentions
+				.size()]));
+		fileDialog.setFilterNames(extentionNames
+				.toArray(new String[extentionNames.size()]));
+		return fileDialog.open();
+	}
+
+	/**
 	 * Open file dialog
 	 * 
 	 * @param filter
 	 *            Starting directory
+	 * @param ext
+	 *            File extension types as defined in KWindow
 	 * @return Returns path to selected file
 	 */
 	public static String openFileDialog(String filter, int ext) {
-		FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getShell());
-		fileDialog.setFilterPath(filter);
-		fileDialog.setText(fileDialogTitle);
-		List<String> extentions = new ArrayList<String>();
-		List<String> extentionNames = new ArrayList<String>();
-		
-		if(ext == ALL) {
-			extentions.add("*.*");
-			extentionNames.add("Allfiles");
-		}
-		
-		if((ext & TXT) == 1) {
-			extentions.add("*.txt");
-			extentionNames.add("Textfiles(*.txt)");
-		}
-		fileDialog.setFilterExtensions(extentions.toArray(new String[extentions.size()]));
-		fileDialog.setFilterNames(extentionNames.toArray(new String[extentionNames.size()]));
-		return fileDialog.open();
+		return fileDialog(filter, null, ext);
+	}
+
+	/**
+	 * Save As... file dialog
+	 * 
+	 * @param filter
+	 *            Starting directory
+	 * @param name
+	 *            Name of the file to save
+	 * @param ext
+	 *            File extension types as defined in KWindow
+	 * @return Returns path to selected file
+	 */
+	public static String saveFileDialog(String filter, String name, int ext) {
+		return fileDialog(filter, name, ext);
 	}
 }

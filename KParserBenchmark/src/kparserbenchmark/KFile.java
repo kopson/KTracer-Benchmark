@@ -28,11 +28,13 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import kparserbenchmark.intro.Application;
 import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.Workspace;
 
 /**
  * File utilities class
@@ -41,6 +43,9 @@ import kparserbenchmark.projectexplorer.Project;
  */
 public class KFile extends File {
 
+	// Logger instance
+	private static final Logger LOG = Logger.getLogger(KFile.class.getName());
+		
 	/**
 	 * Serial version ID
 	 */
@@ -109,10 +114,12 @@ public class KFile extends File {
 					return true;
 				} catch (FileNotFoundException e) {
 					KWindow.displayError(e.getMessage());
+					LOG.log(Level.SEVERE, e.getMessage());
 				}
 			}
 		} catch (IOException e) {
 			KWindow.displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
 		}
 		return false;
 	}
@@ -143,8 +150,10 @@ public class KFile extends File {
 			in.close();
 		} catch (FileNotFoundException e) {
 			KWindow.displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
 			KWindow.displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
 		}
 
 		return null;
@@ -163,6 +172,7 @@ public class KFile extends File {
 			out.close();
 		} catch (IOException e) {
 			KWindow.displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
 		}
 	}
 
@@ -189,8 +199,10 @@ public class KFile extends File {
 			in.close();
 		} catch (FileNotFoundException e) {
 			KWindow.displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
 		} catch (IOException e) {
 			KWindow.displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
 		}
 
 		return stringBuilder.toString();
@@ -271,7 +283,7 @@ public class KFile extends File {
 	 *         old workspace is not empty
 	 */
 	public static boolean checkWorkspaceNotEmpty(String path) {
-		File oldWorkspace = new File(Application.getDefaultWorkspace());
+		File oldWorkspace = new File(Workspace.getInstance().getPath());
 		// TODO: Return true only if workspace contains valid projects
 		try {
 			if (oldWorkspace.isDirectory() && oldWorkspace.list().length > 0
@@ -282,6 +294,7 @@ public class KFile extends File {
 			}
 		} catch (IOException e) {
 			KWindow.displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
 		}
 		return false;
 	}
@@ -293,6 +306,7 @@ public class KFile extends File {
 			writer.close();
 		} catch (IOException e) {
 			KWindow.displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
 		}
 	}
 }

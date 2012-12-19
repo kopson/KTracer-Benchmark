@@ -11,7 +11,7 @@ import org.eclipse.jface.viewers.Viewer;
 public class ProjectContentProvider implements ITreeContentProvider {
 
 	//Content's provider data - list of all workspace projects
-	private ProjectModel model;
+	private Workspace model;
 
 	@Override
 	public void dispose() {
@@ -19,7 +19,7 @@ public class ProjectContentProvider implements ITreeContentProvider {
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		this.model = (ProjectModel) newInput;
+		this.model = (Workspace) newInput;
 	}
 
 	@Override

@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import kparserbenchmark.KFile;
 import kparserbenchmark.KWindow;
@@ -14,6 +16,9 @@ import kparserbenchmark.KWindow;
  */
 public class Project {
 
+	// Logger instance
+	private static final Logger LOG = Logger.getLogger(Project.class.getName());
+		
 	// Obligatory attributes
 	private String name;
 	private Types type;
@@ -141,10 +146,12 @@ public class Project {
 		File projDir = new File(projPath);
 		if (propFile.exists()) {
 			KWindow.displayError(errorDup);
+			LOG.log(Level.SEVERE, errorDup);
 			return false;
 		}
 		if (projDir.exists() && projDir.isDirectory()) {
 			KWindow.displayError(errorDup);
+			LOG.log(Level.SEVERE, errorDup);
 			return false;
 		}
 
@@ -154,6 +161,7 @@ public class Project {
 		try {
 			if (!propFile.createNewFile() || !propFile.canWrite()) {
 				KWindow.displayError(errorCreat);
+				LOG.log(Level.SEVERE, errorCreat);
 				return false;
 			}
 		} catch (IOException e) {

@@ -2,8 +2,6 @@ package kparserbenchmark.projectexplorer;
 
 import kparserbenchmark.KFile;
 
-import org.eclipse.core.runtime.Assert;
-
 /**
  * Project's file representation in ProjectExplorer
  * 
@@ -16,19 +14,22 @@ public class Category {
 
 	// Project's file path
 	private String path;
-		
+
 	// Project that this file belongs to
 	private Project parent;
 
 	/**
 	 * The constructor
 	 * 
-	 * @param parent File's parent project
-	 * @param path File's path
-	 * @param name File's name
+	 * @param parent
+	 *            File's parent project
+	 * @param path
+	 *            File's path
+	 * @param name
+	 *            File's name
 	 */
 	public Category(Project parent, String path, String name) {
-		Assert.isNotNull(parent);
+		// Assert.isNotNull(parent);
 		this.parent = parent;
 		this.path = path;
 		this.name = name;
@@ -37,6 +38,14 @@ public class Category {
 	/**
 	 * Based on this method the IEditorInput will determine if the corresponding
 	 * editor is already open or if a new editor must be opened.
+	 * 
+	 * @param obj
+	 *            Object to compare with
+	 * @return Returns true if two objects point to the same file. File can be
+	 *         opened:<br>
+	 *         - in context of the project. In this case we are comparing file's
+	 *         parent project and file name<br>
+	 *         - as stand-alone file. In this case we are comparing file's path
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -46,10 +55,14 @@ public class Category {
 			return false;
 
 		if (obj instanceof Category) {
-			if (((Category) obj).parent.equals(this.parent)) {
-				return ((Category) obj).name.equals(this.name);
+			if (this.parent != null && ((Category) obj).parent != null) {
+				if (((Category) obj).parent.equals(this.parent)) {
+					return ((Category) obj).name.equals(this.name);
+				} else {
+					return false;
+				}
 			} else {
-				return false;
+				return ((Category) obj).path.equals(this.path);
 			}
 		} else {
 			return false;
@@ -63,12 +76,23 @@ public class Category {
 	public String getPath() {
 		return path;
 	}
-	
+
+	/**
+	 * Return parent's path
+	 * 
+	 * @return Returns parent's path
+	 */
+	public String getParentPath() {
+		if (parent != null)
+			return parent.getPath();
+		return null;
+	}
+
 	/**
 	 * Return file text
 	 * 
 	 * @return Returns file text
-	 */	
+	 */
 	public String getText() {
 		return new KFile(path).getText();
 	}

@@ -1,5 +1,9 @@
 package kparserbenchmark.projectexplorer;
 
+import java.util.logging.Logger;
+
+import kparserbenchmark.KImage;
+import kparserbenchmark.KWindow;
 import kparserbenchmark.commands.OpenProjectAction;
 import kparserbenchmark.commands.RefreshProjectAction;
 import kparserbenchmark.commands.ScriptEditorAction;
@@ -26,9 +30,13 @@ import org.eclipse.ui.part.ViewPart;
 /**
  * Project explorer view
  * 
- * @author root
+ * @author kopson
  */
 public class ProjectExplorer extends ViewPart {
+
+	// Logger instance
+	private final static Logger LOG = Logger.getLogger(ProjectExplorer.class
+			.getName());
 
 	/**
 	 * Tree viewer with custom expanding handling
@@ -76,15 +84,16 @@ public class ProjectExplorer extends ViewPart {
 		// Expand the tree
 		viewer.setAutoExpandLevel(1);
 		// Provide the input to the ContentProvider
-		viewer.setInput(new ProjectModel());
+		viewer.setInput(Workspace.getInstance());
 
 		// Get some actions from main menu and add them to context menu
-		IWorkbenchWindow window = getSite().getPage()
-				.getWorkbenchWindow();
+		IWorkbenchWindow window = getSite().getPage().getWorkbenchWindow();
 		final IWorkbenchAction runEditorAction = new ScriptEditorAction(window);
-		final OpenProjectAction openProjectAction = new OpenProjectAction(window);
-		final RefreshProjectAction refreshProjectAction = new RefreshProjectAction(window);
-		
+		final OpenProjectAction openProjectAction = new OpenProjectAction(
+				window);
+		final RefreshProjectAction refreshProjectAction = new RefreshProjectAction(
+				window);
+
 		// Create new context menu for tree viewer
 		MenuManager menuManager = new MenuManager();
 		viewer.getControl().setMenu(
@@ -105,7 +114,8 @@ public class ProjectExplorer extends ViewPart {
 								IWorkbenchActionConstants.MB_ADDITIONS));
 					} else if (selection.getFirstElement() instanceof Category) {
 						manager.add(runEditorAction);
-						manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+						manager.add(new Separator(
+								IWorkbenchActionConstants.MB_ADDITIONS));
 					}
 				}
 			}
@@ -144,6 +154,7 @@ public class ProjectExplorer extends ViewPart {
 				}
 			}
 		});
+		updateStatusLine();
 	}
 
 	@Override
@@ -160,6 +171,7 @@ public class ProjectExplorer extends ViewPart {
 		if (viewer != null) {
 			viewer.refresh();
 		}
+		updateStatusLine();
 	}
 
 	/**
@@ -176,6 +188,20 @@ public class ProjectExplorer extends ViewPart {
 			viewer.refresh();
 			viewer.setExpandedState(p, exp);
 		}
+		updateStatusLine();
 	}
 
+	/**
+	 * Update status line after reading workspace 
+	 */
+	private void updateStatusLine() {
+		String statusMessage = Workspace.getInstance().getError();
+		if (statusMessage != null)
+			KWindow.getStatusLine(this).setMessage(
+					KImage.getImage(KImage.IMG_WARNING_STATUS), statusMessage);
+		else
+			KWindow.getStatusLine(this).setMessage(
+					KImage.getImage(KImage.IMG_OK_STATUS),
+					"Loaded workspace: " + Workspace.getInstance().getPath());
+	}
 }
