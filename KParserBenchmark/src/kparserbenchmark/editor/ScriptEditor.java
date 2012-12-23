@@ -18,10 +18,10 @@ package kparserbenchmark.editor;
 
 import java.io.File;
 
-import kparserbenchmark.KFile;
-import kparserbenchmark.KWindow;
 import kparserbenchmark.projectexplorer.Category;
 import kparserbenchmark.projectexplorer.Workspace;
+import kparserbenchmark.utils.KFile;
+import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;

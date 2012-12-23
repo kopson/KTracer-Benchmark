@@ -2,11 +2,11 @@ package kparserbenchmark.commands;
 
 import java.io.File;
 
-import kparserbenchmark.KWindow;
-import kparserbenchmark.intro.Application;
+import kparserbenchmark.application.Application;
 import kparserbenchmark.projectexplorer.Category;
 import kparserbenchmark.projectexplorer.Project;
 import kparserbenchmark.projectexplorer.Workspace;
+import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;

@@ -16,12 +16,12 @@
 
 package kparserbenchmark.commands;
 
-import kparserbenchmark.KImage;
-import kparserbenchmark.KWindow;
-import kparserbenchmark.intro.Application;
+import kparserbenchmark.application.Application;
 import kparserbenchmark.projectexplorer.Project;
 import kparserbenchmark.projectexplorer.ProjectExplorer;
 import kparserbenchmark.projectwizard.NewProjectWizard;
+import kparserbenchmark.utils.KImage;
+import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

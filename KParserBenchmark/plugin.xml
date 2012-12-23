@@ -8,7 +8,7 @@
       <application
             icon="icons/splash_icon_32.png">
          <run
-               class="kparserbenchmark.intro.Application">
+               class="kparserbenchmark.application.Application">
          </run>
       </application>
    </extension>
@@ -63,6 +63,14 @@
             name="Project"
             restorable="true">
       </view>
+      <view
+            allowMultiple="false"
+            class="kparserbenchmark.consoleView.ConsolePanel"
+            icon="icons/terminal_16.png"
+            id="KParserBenchmark.consoleView"
+            name="Console"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -77,8 +85,8 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="kparserbenchmark.intro.Perspective"
-            icon="icons/alt_window_16.gif"
+            class="kparserbenchmark.application.Perspective"
+            icon="icons/splash_icon_16.png"
             id="KParserBenchmark.perspective"
             name="RCP Perspective">
       </perspective>
@@ -98,12 +106,24 @@
                standalone="false"
                visible="true">
          </view>
+         <view
+               closeable="true"
+               id="KParserBenchmark.consoleView"
+               minimized="false"
+               moveable="true"
+               ratio="0.7f"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="true">
+         </view>
       </perspectiveExtension>
    </extension>
    <extension
          point="org.eclipse.ui.intro.config">
       <config
-            introId="kparserbenchmark.intro"
+            introId="kparserbenchmark.application.intro"
             content="introContent.xml"
             id="KParserBenchmark.configId">
          <presentation
@@ -119,10 +139,10 @@
          point="org.eclipse.ui.intro">
       <intro
             class="org.eclipse.ui.intro.config.CustomizableIntroPart"
-            id="kparserbenchmark.intro">
+            id="kparserbenchmark.application.intro">
       </intro>
       <introProductBinding
-            introId="kparserbenchmark.intro"
+            introId="kparserbenchmark.application.intro"
             productId="KParserBenchmark.product">
       </introProductBinding>
    </extension>

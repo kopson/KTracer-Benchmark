@@ -1,7 +1,7 @@
 package kparserbenchmark.projectexplorer;
 
-import kparserbenchmark.KImage;
 import kparserbenchmark.projectexplorer.Project.Status;
+import kparserbenchmark.utils.KImage;
 
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;

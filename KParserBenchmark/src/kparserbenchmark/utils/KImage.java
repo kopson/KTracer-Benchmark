@@ -14,9 +14,11 @@
    limitations under the License.
  *******************************************************************************/
 
-package kparserbenchmark;
+package kparserbenchmark.utils;
 
 import java.net.URL;
+
+import kparserbenchmark.application.Activator;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -44,6 +46,10 @@ public class KImage {
 	public static final String IMG_PROJECT_CLOSED = "/icons/box_24.png";
 	public static final String IMG_PROJECT_FILE = "/icons/document_24.png";
 	public static final String IMG_SCRIPT_EDITOR = "icons/pencil_16.png";
+	public static final String IMG_LOG_CONSOLE = "/icons/terminal_16.png";
+	public static final String IMG_CLEAR_CONSOLE = "/icons/trash_16.png";
+	public static final String IMG_SAVE_CONSOLE =  "/icons/save_16.png";
+	public static final String IMG_STOP_CONSOLE = "/icons/delete_16.png";
 	
 	//Image icons for status line
 	public static final String IMG_INFO_STATUS = "/icons/status/info_16.png";

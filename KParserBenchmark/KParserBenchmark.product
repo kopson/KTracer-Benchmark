@@ -33,7 +33,7 @@ Licensed under the Apache License, Version 2.0
       </win>
    </launcher>
 
-   <intro introId="kparserbenchmark.intro"/>
+   <intro introId="kparserbenchmark.application.intro"/>
 
    <vm>
    </vm>

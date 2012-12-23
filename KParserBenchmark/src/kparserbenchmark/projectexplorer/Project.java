@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import kparserbenchmark.KFile;
-import kparserbenchmark.KWindow;
+import kparserbenchmark.utils.KFile;
+import kparserbenchmark.utils.KWindow;
 
 /**
  * Controls life cycle of the project

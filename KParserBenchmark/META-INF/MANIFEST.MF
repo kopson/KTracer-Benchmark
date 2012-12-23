@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: KTracer Benchmark
 Bundle-SymbolicName: KParserBenchmark; singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Activator: kparserbenchmark.Activator
+Bundle-Activator: kparserbenchmark.application.Activator
 Bundle-Vendor: kopson
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

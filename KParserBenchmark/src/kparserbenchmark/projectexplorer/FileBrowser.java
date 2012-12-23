@@ -19,7 +19,7 @@ import org.osgi.framework.FrameworkUtil;
 
 public class FileBrowser extends ViewPart {
 
-	public static final String ID = "kparserbenchmark.projectexplorer.filebrowser";
+	public static final String ID = "kparserbenchmark.application.projectexplorer.filebrowser";
 	private Image image;
 
 	@Override

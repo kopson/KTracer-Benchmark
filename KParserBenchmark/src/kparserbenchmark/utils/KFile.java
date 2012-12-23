@@ -14,7 +14,7 @@
    limitations under the License.
  *******************************************************************************/
 
-package kparserbenchmark;
+package kparserbenchmark.utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -176,6 +176,23 @@ public class KFile extends File {
 		}
 	}
 
+	/**
+	 * Append text to file
+	 * 
+	 * @param text Text to save
+	 */
+	public void appendText(String text) {
+		BufferedWriter out;
+		try {
+			out = new BufferedWriter(new FileWriter(this, true));
+			out.append(text);
+			out.close();
+		} catch (IOException e) {
+			KWindow.displayError(e.getMessage());
+			LOG.log(Level.SEVERE, e.getMessage());
+		}
+	}
+	
 	/**
 	 * Get text from file
 	 * 

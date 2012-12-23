@@ -19,11 +19,11 @@ package kparserbenchmark.commands;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import kparserbenchmark.Activator;
-import kparserbenchmark.KImage;
+import kparserbenchmark.application.Activator;
 import kparserbenchmark.editor.ScriptEditor;
 import kparserbenchmark.editor.ScriptEditorInput;
 import kparserbenchmark.projectexplorer.Category;
+import kparserbenchmark.utils.KImage;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;

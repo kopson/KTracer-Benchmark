@@ -18,10 +18,10 @@ package kparserbenchmark.commands;
 
 import java.util.logging.Logger;
 
-import kparserbenchmark.KWindow;
 import kparserbenchmark.projectexplorer.Project;
 import kparserbenchmark.projectexplorer.Project.Status;
 import kparserbenchmark.projectexplorer.ProjectExplorer;
+import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;

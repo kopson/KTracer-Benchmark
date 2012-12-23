@@ -14,7 +14,7 @@
    limitations under the License.
  *******************************************************************************/
 
-package kparserbenchmark;
+package kparserbenchmark.utils;
 
 /**
  * Utilities class for Ktrace application
@@ -23,6 +23,9 @@ package kparserbenchmark;
  */
 public class KTrace {
 
+	/** Ktrace command */
+	public static final String kCommand = "ktrace";
+	
 	/** Scheduler tracing project type */
 	public static final int PROJECT_TYPE_SCHEDULER 	= 0;
 	/** Test proect type */

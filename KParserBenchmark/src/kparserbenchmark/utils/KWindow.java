@@ -14,7 +14,7 @@
    limitations under the License.
  *******************************************************************************/
 
-package kparserbenchmark;
+package kparserbenchmark.utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import kparserbenchmark.editor.ScriptEditor;
 import kparserbenchmark.editor.ScriptEditorInput;
 import kparserbenchmark.projectexplorer.Category;
+import kparserbenchmark.projectexplorer.Workspace;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.action.IStatusLineManager;
@@ -52,10 +53,14 @@ public class KWindow {
 	private static final String pathDialogDescription = "Select directory";
 
 	// Logger instance
-	private static final Logger LOG = Logger.getLogger(KWindow.class.getName());
+	private static final Logger LOGe = Logger.getLogger(KWindow.class.getName());
 
 	/** Set *.txt file extensions */
 	public static final int TXT = 0x000F;
+	
+	/** Set *.log file extensions */
+	public static final int LOG = 0x00F0;
+	
 	/** Set all file extensions */
 	public static final int ALL = 0xFFFF;
 
@@ -113,7 +118,7 @@ public class KWindow {
 					ScriptEditor.ID);
 		} catch (PartInitException e) {
 			displayError(e.getMessage());
-			LOG.log(Level.SEVERE, e.getMessage());
+			LOGe.log(Level.SEVERE, e.getMessage());
 		}
 		return null;
 	}
@@ -175,7 +180,7 @@ public class KWindow {
 	 * Create new Open or Save As... file dialog
 	 * 
 	 * @param filter
-	 *            Starting directory
+	 *            Starting directory. If null use Workspace directory.
 	 * @param name
 	 *            Name of the file to save. If name is null create Open dialog
 	 *            otherwise create Save As... dialog
@@ -190,6 +195,10 @@ public class KWindow {
 		else
 			dialogFlags = SWT.OPEN;
 
+		if (filter == null) {
+			filter = Workspace.getInstance().getPath();
+		}
+		
 		FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getShell(), dialogFlags);
 		fileDialog.setFilterPath(filter);
@@ -209,6 +218,12 @@ public class KWindow {
 			extentions.add("*.txt");
 			extentionNames.add("Textfiles(*.txt)");
 		}
+		
+		if ((ext & LOG) == 1) {
+			extentions.add("*.log");
+			extentionNames.add("Logfiles(*.log)");
+		}
+		
 		fileDialog.setFilterExtensions(extentions.toArray(new String[extentions
 				.size()]));
 		fileDialog.setFilterNames(extentionNames

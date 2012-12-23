@@ -1,6 +1,6 @@
 package kparserbenchmark.projectexplorer;
 
-import kparserbenchmark.KFile;
+import kparserbenchmark.utils.KFile;
 
 /**
  * Project's file representation in ProjectExplorer

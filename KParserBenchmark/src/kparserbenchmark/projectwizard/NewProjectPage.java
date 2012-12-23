@@ -4,10 +4,10 @@ import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import kparserbenchmark.KTrace;
-import kparserbenchmark.KWindow;
 import kparserbenchmark.projectexplorer.Project;
 import kparserbenchmark.projectexplorer.Workspace;
+import kparserbenchmark.utils.KTrace;
+import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;

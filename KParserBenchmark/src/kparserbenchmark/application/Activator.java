@@ -14,7 +14,7 @@
    limitations under the License.
  *******************************************************************************/
 
-package kparserbenchmark;
+package kparserbenchmark.application;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;

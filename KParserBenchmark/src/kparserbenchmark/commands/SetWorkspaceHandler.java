@@ -18,10 +18,10 @@ package kparserbenchmark.commands;
 
 import java.io.FileNotFoundException;
 
-import kparserbenchmark.KFile;
-import kparserbenchmark.KImage;
-import kparserbenchmark.KWindow;
 import kparserbenchmark.projectexplorer.Workspace;
+import kparserbenchmark.utils.KFile;
+import kparserbenchmark.utils.KImage;
+import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;

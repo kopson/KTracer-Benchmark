@@ -1,4 +1,4 @@
-package kparserbenchmark.intro;
+package kparserbenchmark.application;
 
 import java.io.File;
 

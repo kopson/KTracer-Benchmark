@@ -1,4 +1,5 @@
-package kparserbenchmark.intro;
+package kparserbenchmark.application;
+
 
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;

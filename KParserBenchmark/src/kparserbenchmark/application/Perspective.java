@@ -1,4 +1,4 @@
-package kparserbenchmark.intro;
+package kparserbenchmark.application;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;

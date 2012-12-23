@@ -1,8 +1,7 @@
-package kparserbenchmark.intro;
+package kparserbenchmark.application;
 
-import kparserbenchmark.KImage;
+import kparserbenchmark.utils.KImage;
 
-import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.application.ActionBarAdvisor;

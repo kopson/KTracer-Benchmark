@@ -2,12 +2,12 @@ package kparserbenchmark.projectexplorer;
 
 import java.util.logging.Logger;
 
-import kparserbenchmark.KImage;
-import kparserbenchmark.KWindow;
 import kparserbenchmark.commands.OpenProjectAction;
 import kparserbenchmark.commands.RefreshProjectAction;
 import kparserbenchmark.commands.ScriptEditorAction;
 import kparserbenchmark.projectexplorer.Project.Status;
+import kparserbenchmark.utils.KImage;
+import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
