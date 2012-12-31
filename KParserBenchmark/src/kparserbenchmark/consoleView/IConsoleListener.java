@@ -14,48 +14,18 @@
    limitations under the License.
  *******************************************************************************/
 
-package kparserbenchmark.projectwizard;
-
-import kparserbenchmark.projectexplorer.Project;
-
-import org.eclipse.jface.wizard.Wizard;
+package kparserbenchmark.consoleView;
 
 /**
- * Creates new project wizard
+ * Console events listener interface
  * 
  * @author kopson
  */
-public class NewProjectWizard extends Wizard {
-
-	// Wizard pages
-	protected NewProjectPage one;
-
-	// Created project
-	private Project proj;
-
-	/**
-	 * The constructor
-	 */
-	public NewProjectWizard() {
-		super();
-		setNeedsProgressMonitor(true);
-	}
-
-	@Override
-	public void addPages() {
-		one = new NewProjectPage();
-		addPage(one);
-	}
-
-	@Override
-	public boolean performFinish() {
-		proj = new Project(one.getProjectName(), one.getProjectType(),
-				one.getProjectPath(), one.getProjectSummary(),
-				one.getProjectDescription());
-		return true;
-	}
-
-	public Project getProj() {
-		return proj;
-	}
+public interface IConsoleListener {
+	
+	/** Fires on process execution start */
+	public void processStarted();
+	
+	/** Fires on process execution finish */
+	public void processFinished();
 }

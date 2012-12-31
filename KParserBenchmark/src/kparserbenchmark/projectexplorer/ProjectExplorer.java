@@ -3,6 +3,7 @@ package kparserbenchmark.projectexplorer;
 import java.util.logging.Logger;
 
 import kparserbenchmark.commands.OpenProjectAction;
+import kparserbenchmark.commands.ProjectWizardHandler;
 import kparserbenchmark.commands.RefreshProjectAction;
 import kparserbenchmark.commands.ScriptEditorAction;
 import kparserbenchmark.projectexplorer.Project.Status;
@@ -24,7 +25,9 @@ import org.eclipse.swt.events.TreeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 /**

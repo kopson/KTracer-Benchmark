@@ -14,48 +14,30 @@
    limitations under the License.
  *******************************************************************************/
 
-package kparserbenchmark.projectwizard;
+package kparserbenchmark.utils;
 
-import kparserbenchmark.projectexplorer.Project;
-
-import org.eclipse.jface.wizard.Wizard;
+import java.io.IOException;
 
 /**
- * Creates new project wizard
+ * Throw when trying to create file/directory with name that already exist in selected
+ * destination path
  * 
  * @author kopson
  */
-public class NewProjectWizard extends Wizard {
-
-	// Wizard pages
-	protected NewProjectPage one;
-
-	// Created project
-	private Project proj;
+public class DuplicatedPathException extends IOException {
 
 	/**
-	 * The constructor
+	 * ID
 	 */
-	public NewProjectWizard() {
-		super();
-		setNeedsProgressMonitor(true);
+	private static final long serialVersionUID = 7848403718333550300L;
+	
+	/**
+	 * The constructor
+	 * 
+	 * @param path Duplicated path
+	 */
+	public DuplicatedPathException(String path) {
+		super("Path: " + path + " already exists");	
 	}
 
-	@Override
-	public void addPages() {
-		one = new NewProjectPage();
-		addPage(one);
-	}
-
-	@Override
-	public boolean performFinish() {
-		proj = new Project(one.getProjectName(), one.getProjectType(),
-				one.getProjectPath(), one.getProjectSummary(),
-				one.getProjectDescription());
-		return true;
-	}
-
-	public Project getProj() {
-		return proj;
-	}
 }

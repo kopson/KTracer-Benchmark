@@ -45,7 +45,7 @@ public class KFile extends File {
 
 	// Logger instance
 	private static final Logger LOG = Logger.getLogger(KFile.class.getName());
-		
+
 	/**
 	 * Serial version ID
 	 */
@@ -162,7 +162,8 @@ public class KFile extends File {
 	/**
 	 * Save text to file
 	 * 
-	 * @param text Text to save
+	 * @param text
+	 *            Text to save
 	 */
 	public void setText(String text) {
 		BufferedWriter out;
@@ -179,7 +180,8 @@ public class KFile extends File {
 	/**
 	 * Append text to file
 	 * 
-	 * @param text Text to save
+	 * @param text
+	 *            Text to save
 	 */
 	public void appendText(String text) {
 		BufferedWriter out;
@@ -192,7 +194,7 @@ public class KFile extends File {
 			LOG.log(Level.SEVERE, e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Get text from file
 	 * 
@@ -247,7 +249,7 @@ public class KFile extends File {
 	}
 
 	/**
-	 * Check if toCheck string is a valid path to create a directory
+	 * Check if toCheck string is a valid path to create a new directory
 	 * 
 	 * @param toCheck
 	 *            Path to check
@@ -316,6 +318,9 @@ public class KFile extends File {
 		return false;
 	}
 
+	/**
+	 * Clear file
+	 */
 	public void clear() {
 		try {
 			FileOutputStream writer = new FileOutputStream(this);
@@ -324,6 +329,47 @@ public class KFile extends File {
 		} catch (IOException e) {
 			KWindow.displayError(e.getMessage());
 			LOG.log(Level.SEVERE, e.getMessage());
+		}
+	}
+
+	/**
+	 * Check if file name is valid name for file
+	 * 
+	 * @return Returns true if name is valid or throws exception
+	 * 
+	 * @throws DuplicatedPathException
+	 * @throws InvalidPathException
+	 */
+	public boolean isNameValid() throws DuplicatedPathException, InvalidPathException {
+		Pattern pattern = Pattern.compile(".*\\W+.*");
+		String path = this.getAbsolutePath();
+		String name = this.getName();
+		Matcher matcher = pattern.matcher(name);
+		if (this.exists()) {
+			throw new DuplicatedPathException(path);
+		} else {
+			if (matcher.find()) {
+				throw new InvalidPathException(path);
+			} else {
+				return true;
+			}
+		}
+	}
+	
+	/**
+	 * Check if file name and path is valid name and path for file
+	 * 
+	 * @return Returns true if name and path is valid or throws exception
+	 * 
+	 * @throws DuplicatedPathException
+	 * @throws InvalidPathException
+	 */
+	public boolean isPathNameValid() throws DuplicatedPathException, InvalidPathException {
+		boolean isValid = isNameValid();
+		if (!this.exists()) {
+			throw new InvalidPathException(this.getAbsolutePath());
+		} else {
+			return isValid;
 		}
 	}
 }

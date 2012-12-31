@@ -63,7 +63,12 @@ public class KProcess extends Thread {
 	/**
 	 * Event listeners list
 	 */
-	private final List<IProcessFinished> processListeners = new ArrayList<IProcessFinished>();
+	private final List<IProcessFinished> processListeners;
+	
+	public KProcess() {
+		super();
+		processListeners = new ArrayList<IProcessFinished>();
+	}
 
 	/** Execute external command */
 	public void execute(String command) {

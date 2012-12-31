@@ -6,7 +6,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import kparserbenchmark.utils.KWindow;
+
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 
 /**
  * Project Explorer content model
@@ -14,6 +18,16 @@ import org.eclipse.core.runtime.Assert;
  * @author kopson
  */
 public final class Workspace {
+
+	// Logger instance
+	private final static Logger LOG = Logger.getLogger(Workspace.class
+			.getName());
+
+	// List of projects
+	private List<Project> projects;
+
+	// Workspace path
+	private String path;
 
 	// Implementation of Singleton Pattern
 	private static Workspace Instance;
@@ -32,6 +46,16 @@ public final class Workspace {
 	 * Private constructor
 	 */
 	private Workspace() {
+
+		KWindow.getPrefs2().addPropertyChangeListener(
+				new IPropertyChangeListener() {
+					@Override
+					public void propertyChange(PropertyChangeEvent event) {
+						if (event.getProperty() == "MySTRING1") {
+							path = event.getNewValue().toString();
+						}
+					}
+				});
 	}
 
 	/**
@@ -45,16 +69,6 @@ public final class Workspace {
 		}
 		return Instance;
 	}
-
-	// Logger instance
-	private final static Logger LOG = Logger.getLogger(Workspace.class
-			.getName());
-
-	// List of projects
-	private List<Project> projects;
-
-	// Workspace path
-	private String path;
 
 	/**
 	 * Sets application's projects default location

@@ -1,24 +1,38 @@
+/*******************************************************************************
+ Copyright (c) 2012 kopson kopson.piko@gmail.com
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ *******************************************************************************/
+
 package kparserbenchmark.projectwizard;
 
 import java.io.File;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import kparserbenchmark.projectexplorer.Project;
 import kparserbenchmark.projectexplorer.Workspace;
+import kparserbenchmark.utils.DuplicatedPathException;
+import kparserbenchmark.utils.InvalidPathException;
+import kparserbenchmark.utils.KFile;
 import kparserbenchmark.utils.KTrace;
 import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -29,33 +43,41 @@ import org.eclipse.swt.widgets.Text;
 /**
  * Wizard class for creating new project
  * 
- * @author root
+ * @author kopson
  */
 public class NewProjectPage extends WizardPage {
 
 	// Project attributes
 	private Text projectName;
-	private Project.Types projectType;
 	private Text projectPath;
+	private Project.Types projectType;
 	private Text projectDescription;
 	private Text projectSummary;
 
-	//Project types radio buttons
+	// Project types radio buttons
 	private Button[] projectTypes;
+
+	// Global error in dialog input data
+	private int invalidData;
 	
-	//Global error in dialog input data
-	private boolean invalidData;
+	//Error flags
+	private static final int NO_ERROR 	= 0x0000;
+	private static final int NAME_ERROR = 0x000F;
+	private static final int PATH_ERROR = 0x00F0;
 	
 	// Widget container
 	private Composite container;
 
+	//Event source string
+	private String string;
+	
 	// Page labels
 	private static final String title = "New project wizard";
 	private static final String description = "Create new KTrace project";
 	private static final String description2 = "Set KTrace project name";
 	private static final String description3 = "Set KTrace project path";
 	private static final String description4 = "Invalid input data";
-	
+
 	private static final String nameLabel = "Project name: ";
 	private static final String typeLabel = "Project type: ";
 	private static final String pathLabel = "Project path: ";
@@ -64,7 +86,7 @@ public class NewProjectPage extends WizardPage {
 	private static final String summaryLabel = "Project summary: ";
 	private static final String projectNameValidator = "Please use only letters and digits";
 	private static final String projectNameDupVal = "Project with this name already exists";
-	
+
 	/**
 	 * The constructor
 	 */
@@ -72,7 +94,7 @@ public class NewProjectPage extends WizardPage {
 		super(title);
 		setTitle(title);
 		setDescription(description2);
-		invalidData = false;
+		invalidData = NO_ERROR;
 	}
 
 	@Override
@@ -86,13 +108,13 @@ public class NewProjectPage extends WizardPage {
 		createProjectPath();
 		createProjectType();
 		createProjectDescriptionAndSummary();
-		
+
 		// Required to avoid an error in the system
 		setControl(container);
 		setPageComplete(false);
 	}
 
-	/*
+	/**
 	 * Create project name selection
 	 */
 	private void createProjectName() {
@@ -100,15 +122,8 @@ public class NewProjectPage extends WizardPage {
 		projectNameLabel.setText(nameLabel);
 		projectName = new Text(container, SWT.BORDER | SWT.SINGLE);
 
-		final ControlDecoration txtDecorator = new ControlDecoration(
-				projectName, SWT.TOP | SWT.RIGHT);
-		FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
-				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
-		Image img = fieldDecoration.getImage();
-		txtDecorator.setImage(img);
-		txtDecorator.setDescriptionText(projectNameValidator);
-		// hiding it initially
-		txtDecorator.hide();
+		final ControlDecoration txtDecorator = KWindow.createLabelDecoration(
+				projectName, projectNameValidator);
 
 		projectName.setText("");
 		projectName.addKeyListener(new KeyListener() {
@@ -122,65 +137,71 @@ public class NewProjectPage extends WizardPage {
 			 */
 			@Override
 			public void keyReleased(KeyEvent e) {
-				Text text = (Text) e.getSource();
-				String string = text.getText();
-				Pattern pattern = Pattern.compile(".*\\W+.*");
-				Matcher matcher = pattern.matcher(string);
-				if(new File(projectPath.getText() + File.separator + string).exists()) {
+				String string = ((Text) e.getSource()).getText();
+				KFile f = new KFile(projectPath.getText() + File.separator + string);
+				try {
+					if (f.isNameValid()) {
+						txtDecorator.hide();
+						invalidData &= ~NAME_ERROR;
+					}
+				} catch (DuplicatedPathException e1) {
 					txtDecorator.setDescriptionText(projectNameDupVal);
 					txtDecorator.show();
-					invalidData = true;
-				}
-				else {
-					if (matcher.find()) {
-						txtDecorator.show();
-						invalidData = true;
-					} else {
-						txtDecorator.hide();
-						invalidData = false;
-						setDescription(description);
-					}
+					invalidData |= NAME_ERROR;
+				} catch (InvalidPathException e1) {
+					txtDecorator.setDescriptionText(projectNameValidator);
+					txtDecorator.show();
+					invalidData |= NAME_ERROR;
 				}
 				checkIsComplete();
 			}
-
 		});
 
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		projectName.setLayoutData(gd);
 	}
 
-	/*
+	/**
 	 * Create project path selection
 	 */
 	private void createProjectPath() {
 		Label projectDefaultPathLabel = new Label(container, SWT.NULL);
 		projectDefaultPathLabel.setText("");
+		
 		final Button checkButton = new Button(container, SWT.CHECK);
 		checkButton.setText(defaultPathLabel);
 		
 		Label projectPathLabel = new Label(container, SWT.NULL);
 		projectPathLabel.setText(pathLabel);
-		
+
 		Composite subContainer = new Composite(container, SWT.NULL);
+		GridLayout subLayout = new GridLayout();
+		subLayout.numColumns = 3;
+		subContainer.setLayout(subLayout);
+		
 		projectPath = new Text(subContainer, SWT.BORDER | SWT.SINGLE);
 		projectPath.setText(Workspace.getInstance().getPath());
 		projectPath.setEnabled(false);
+		string = projectPath.getText();
 		
+		final ControlDecoration txtDecorator = KWindow.createLabelDecoration(
+				projectPath, projectNameValidator);
+
 		checkButton.setSelection(true);
 		checkButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				if (checkButton.getSelection()) {
 					projectPath.setEnabled(false);
-				} else
+					txtDecorator.hide();
+					invalidData &= ~PATH_ERROR;
+					checkIsComplete();
+				} else {
 					projectPath.setEnabled(true);
+					checkPath(txtDecorator);
+				}
 			}
 		});
-
-		GridLayout layout = new GridLayout();
-		layout.numColumns = 2;
-		subContainer.setLayout(layout);
-
+		new Label(subContainer, SWT.NONE);
 		// Clicking the button will allow the user
 		// to select a directory
 		Button button = new Button(subContainer, SWT.PUSH);
@@ -202,7 +223,8 @@ public class NewProjectPage extends WizardPage {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				checkIsComplete();
+				string = ((Text) e.getSource()).getText();
+				checkPath(txtDecorator);
 			}
 
 		});
@@ -211,7 +233,30 @@ public class NewProjectPage extends WizardPage {
 		subContainer.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 
-	/*
+	/**
+	 * Check if project path is valid
+	 * 
+	 * @param txtDecorator Validation decoration
+	 */
+	private void checkPath(ControlDecoration txtDecorator) {
+		KFile f = new KFile(string);
+		try {
+			if (f.isPathNameValid()) {
+				txtDecorator.hide();
+				invalidData &= ~PATH_ERROR;
+			}
+		} catch (DuplicatedPathException e1) {
+			txtDecorator.hide();
+			invalidData &= ~PATH_ERROR;
+		} catch (InvalidPathException e1) {
+			txtDecorator.setDescriptionText(projectNameValidator);
+			txtDecorator.show();
+			invalidData |= PATH_ERROR;
+		}
+		checkIsComplete();
+	}
+
+	/**
 	 * Create project type radio button selection
 	 */
 	private void createProjectType() {
@@ -231,36 +276,36 @@ public class NewProjectPage extends WizardPage {
 		projectTypes[0].setSelection(true);
 	}
 
-	/*
+	/**
 	 * Create project description and summary controls
 	 */
 	private void createProjectDescriptionAndSummary() {
 		new Label(container, SWT.NULL);
 		new Label(container, SWT.NULL);
-		
+
 		Label projectDescLabel = new Label(container, SWT.NULL);
 		projectDescLabel.setText(descriptionLabel);
 		projectDescription = new Text(container, SWT.BORDER | SWT.SINGLE);
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		projectDescription.setLayoutData(gd);
-		
+
 		Label projectSummaryLabel = new Label(container, SWT.NULL);
 		projectSummaryLabel.setText(summaryLabel);
 		projectSummary = new Text(container, SWT.BORDER | SWT.SINGLE);
 		projectSummary.setLayoutData(gd);
 	}
-	
-	/*
+
+	/**
 	 * Check if all mandatory attributes were set
 	 */
 	private boolean checkIsComplete() {
 		boolean ret = true;
 
-		if (invalidData) {
+		if (invalidData != 0) {
 			ret = false;
 			setDescription(description4);
 		}
-		
+
 		if (projectName.getText().isEmpty()) {
 			setDescription(description2);
 			ret = false;
@@ -274,9 +319,9 @@ public class NewProjectPage extends WizardPage {
 		int i = 0;
 		for (Button button : projectTypes) {
 			if (button.getSelection()) {
-				if(i == 0)
+				if (i == 0)
 					projectType = Project.Types.SCHEDULER;
-				else if(i == 1)
+				else if (i == 1)
 					projectType = Project.Types.TEST;
 			}
 			++i;
@@ -293,7 +338,7 @@ public class NewProjectPage extends WizardPage {
 	public String getProjectName() {
 		return projectName.getText();
 	}
-	
+
 	public Project.Types getProjectType() {
 		return projectType;
 	}

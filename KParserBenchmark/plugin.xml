@@ -150,6 +150,7 @@
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="kparserbenchmark.commands.ProjectWizardHandler"
+            description="Create new project"
             id="KParserBenchmark.newProjectCommand"
             name="New Project">
       </command>
@@ -160,6 +161,7 @@
       </command>
       <command
             defaultHandler="org.eclipse.ui.internal.handlers.QuitHandler"
+            description="Exit application"
             id="KParserBenchmark.exitCommand"
             name="Exit">
       </command>
@@ -174,11 +176,6 @@
             name="About">
       </command>
       <command
-            defaultHandler="org.eclipse.ui.internal.handlers.SaveHandler"
-            id="KParserBenchmark.saveCommand"
-            name="Save">
-      </command>
-      <command
             defaultHandler="org.eclipse.ui.internal.handlers.SaveAsHandler"
             id="KParserBenchmark.saveAsCommand"
             name="Save As">
@@ -187,6 +184,17 @@
             defaultHandler="kparserbenchmark.commands.OpenFileHandler"
             id="KParserBenchmark.openFileCommand"
             name="Open File">
+      </command>
+      <category
+            description="Project related actions"
+            id="KParserBenchmark.ProjectCategory"
+            name="Project Category">
+      </category>
+      <command
+            defaultHandler="kparserbenchmark.commands.ProjectFileWizardHandler"
+            description="Create new file"
+            id="KParserBenchmark.NewFileCommand"
+            name="New File...">
       </command>
    </extension>
    <extension
@@ -198,12 +206,17 @@
                id="KParserBenchmark.fileMenu"
                label="File">
             <command
+                  commandId="org.eclipse.ui.newWizard"
+                  label="New"
+                  style="push">
+            </command>
+            <command
                   commandId="KParserBenchmark.openFileCommand"
                   label="Open"
                   style="push">
             </command>
             <command
-                  commandId="KParserBenchmark.saveCommand"
+                  commandId="org.eclipse.ui.file.save"
                   label="Save"
                   style="push"
                   tooltip="Save file">
@@ -253,6 +266,55 @@
             </command>
          </menu>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="kparserbenchmark.application.GeneralPreferencePage"
+            id="KParserBenchmark.generalPreferencePage"
+            name="Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="kparserbenchmark.application.GeneralPreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="KParserBenchmark.newProjectCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+M2+P">
+      </key>
+      <key
+            commandId="KParserBenchmark.exitCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+Q">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="KParserBenchmark.WizardCategory"
+            name="KProject">
+      </category>
+      <wizard
+            category="KParserBenchmark.WizardCategory"
+            class="kparserbenchmark.projectwizard.NewProjectFileWizard"
+            finalPerspective="KParserBenchmark.perspective"
+            icon="icons/open_16.png"
+            id="KParserBenchmark.NewProjectWizard"
+            name="New  Project">
+      </wizard>
+      <wizard
+            class="kparserbenchmark.NewWizard2"
+            id="KParserBenchmark.wizard2"
+            name="name">
+      </wizard>
    </extension>
 
 </plugin>

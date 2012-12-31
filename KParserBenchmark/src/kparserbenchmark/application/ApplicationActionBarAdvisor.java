@@ -2,9 +2,11 @@ package kparserbenchmark.application;
 
 import kparserbenchmark.commands.OpenProjectAction;
 
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
@@ -17,6 +19,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
 	// Open project Action
 	private OpenProjectAction openProjectAction;
+	private IAction preferencesAction;
 
 	/*
 	 * (non-Javadoc)
@@ -31,6 +34,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 	protected void makeActions(IWorkbenchWindow window) {
 		openProjectAction = new OpenProjectAction(window);
 		register(openProjectAction);
+		
+		preferencesAction = ActionFactory.PREFERENCES.create(window);
+		register(preferencesAction);
 	}
 
 	@Override
@@ -40,5 +46,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 		MenuManager projectMenu = new MenuManager("&Project", "KParserBenchmark.projectMenu");
 		projectMenu.add(openProjectAction);
 		menuBar.add(projectMenu);
+		MenuManager toolsMenu = new MenuManager("&Tools", "KParserBenchmark.toolsMenu");
+		toolsMenu.add(preferencesAction);
+		menuBar.add(toolsMenu);
 	}
 }

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import kparserbenchmark.application.Activator;
 import kparserbenchmark.editor.ScriptEditor;
 import kparserbenchmark.editor.ScriptEditorInput;
 import kparserbenchmark.projectexplorer.Category;
@@ -29,9 +30,15 @@ import kparserbenchmark.projectexplorer.Workspace;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
@@ -53,14 +60,15 @@ public class KWindow {
 	private static final String pathDialogDescription = "Select directory";
 
 	// Logger instance
-	private static final Logger LOGe = Logger.getLogger(KWindow.class.getName());
+	private static final Logger LOGe = Logger
+			.getLogger(KWindow.class.getName());
 
 	/** Set *.txt file extensions */
 	public static final int TXT = 0x000F;
-	
+
 	/** Set *.log file extensions */
 	public static final int LOG = 0x00F0;
-	
+
 	/** Set all file extensions */
 	public static final int ALL = 0xFFFF;
 
@@ -198,7 +206,7 @@ public class KWindow {
 		if (filter == null) {
 			filter = Workspace.getInstance().getPath();
 		}
-		
+
 		FileDialog fileDialog = new FileDialog(PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getShell(), dialogFlags);
 		fileDialog.setFilterPath(filter);
@@ -218,12 +226,12 @@ public class KWindow {
 			extentions.add("*.txt");
 			extentionNames.add("Textfiles(*.txt)");
 		}
-		
+
 		if ((ext & LOG) == 1) {
 			extentions.add("*.log");
 			extentionNames.add("Logfiles(*.log)");
 		}
-		
+
 		fileDialog.setFilterExtensions(extentions.toArray(new String[extentions
 				.size()]));
 		fileDialog.setFilterNames(extentionNames
@@ -258,4 +266,29 @@ public class KWindow {
 	public static String saveFileDialog(String filter, String name, int ext) {
 		return fileDialog(filter, name, ext);
 	}
+
+	/**
+	 * Add decoration to text field
+	 * 
+	 * @param owner Text field that owns decoration
+	 * @param name Text displayed when decoration is shown
+	 * @return Returns decorator object
+	 */
+	public static ControlDecoration createLabelDecoration(Text owner,
+			String name) {
+		final ControlDecoration txtDecorator = new ControlDecoration(owner,
+				SWT.TOP | SWT.RIGHT);
+		FieldDecoration fieldDecoration = FieldDecorationRegistry.getDefault()
+				.getFieldDecoration(FieldDecorationRegistry.DEC_ERROR);
+		Image img = fieldDecoration.getImage();
+		txtDecorator.setImage(img);
+		txtDecorator.setDescriptionText(name);
+		// hiding it initially
+		txtDecorator.hide();
+		return txtDecorator;
+	}
+	
+	public static IPreferenceStore getPrefs2() {
+		return Activator.getDefault().getPreferenceStore();
+		}
 }

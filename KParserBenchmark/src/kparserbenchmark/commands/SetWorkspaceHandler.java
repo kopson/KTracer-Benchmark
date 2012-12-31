@@ -30,8 +30,6 @@ import org.eclipse.core.commands.IHandlerListener;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -166,16 +164,8 @@ public class SetWorkspaceHandler implements IHandler {
 			nameLabel.setText(newWorkspaceLocation);
 
 			nameText = new Text(subContainer, SWT.BORDER);
-			final ControlDecoration txtDecorator = new ControlDecoration(
-					nameText, SWT.TOP | SWT.RIGHT);
-			FieldDecoration fieldDecoration = FieldDecorationRegistry
-					.getDefault().getFieldDecoration(
-							FieldDecorationRegistry.DEC_ERROR);
-			Image img = fieldDecoration.getImage();
-			txtDecorator.setImage(img);
-			txtDecorator.setDescriptionText(nameTextValidator);
-			// hiding it initially
-			txtDecorator.hide();
+			final ControlDecoration txtDecorator = KWindow.createLabelDecoration(
+					nameText, nameTextValidator);
 
 			nameText.setText(Workspace.getInstance().getPath());
 			name = nameText.getText();
@@ -212,7 +202,7 @@ public class SetWorkspaceHandler implements IHandler {
 						if (KFile.isPathVaild(dir)) {
 							nameText.setText(dir);
 							txtDecorator.hide();
-								checkWarning();
+							checkWarning();
 							okButton.setEnabled(true);
 						} else {
 							txtDecorator.show();
