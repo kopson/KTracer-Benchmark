@@ -14,34 +14,14 @@
    limitations under the License.
  *******************************************************************************/
 
-package kparserbenchmark.application;
-
-import kparserbenchmark.utils.KWindow;
-
-import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
-import org.eclipse.jface.preference.IPreferenceStore;
+package kparserbenchmark.projectexplorer;
 
 /**
- * Sets deault values for preferences view
  * 
  * @author kopson
  */
-public class GeneralPreferenceInitializer extends AbstractPreferenceInitializer {
+public interface IWorkspaceListener {
 
-	/**
-	 * The constructor
-	 */
-	public GeneralPreferenceInitializer() {
-		super();
-	}
-
-	@Override
-	public void initializeDefaultPreferences() {
-		IPreferenceStore store = KWindow.getPrefs();
-		if (store != null) {
-			//TODO: Add deault preferences here
-			store.setDefault(GeneralPreferencePage.MY_STRING_1, "http://www.vogella.com");
-		}
-	}
-
+	/** Fires on setting new active project */
+	public void activeProjectChanged();
 }

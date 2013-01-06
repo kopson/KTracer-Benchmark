@@ -12,27 +12,35 @@ Copyright (c) 2012 kopson kopson.piko@gmail.com
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-*******************************************************************************/
+ *******************************************************************************/
 
 package kparserbenchmark.projectwizard;
+
+import java.io.File;
+import java.io.IOException;
+
+import kparserbenchmark.projectexplorer.ProjectExplorer;
+import kparserbenchmark.utils.KImage;
+import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 
 /**
-* Creates new project file wizard
-* 
-* @author kopson
-*/
-public class NewProjectFileWizard extends Wizard implements org.eclipse.ui.INewWizard{
+ * Creates new project file wizard
+ * 
+ * @author kopson
+ */
+public class NewProjectFileWizard extends Wizard implements
+		org.eclipse.ui.INewWizard {
+
+	// The command ID
+	public static final String ID = "KParserBenchmark.NewFileWizard";
 
 	// Wizard pages
 	protected NewProjectFilePage one;
 
-	// Created file name
-	protected String name;
-	
 	/**
 	 * The constructor
 	 */
@@ -49,18 +57,33 @@ public class NewProjectFileWizard extends Wizard implements org.eclipse.ui.INewW
 
 	@Override
 	public boolean performFinish() {
-		name = one.getFileName();
-		
-		return true;
-	}
 
-	public String getFile() {
-		return name;
+		ProjectExplorer pe = (ProjectExplorer) KWindow
+				.getView(ProjectExplorer.ID);
+
+		String fileName = one.getFileName();
+		File f = new File(fileName);
+		try {
+			if (fileName == null || !f.createNewFile())
+				KWindow.getStatusLine(pe).setMessage(
+						KImage.getImage(KImage.IMG_ERR_STATUS),
+						"Error creating file");
+			else {
+				pe.refreshView();
+				KWindow.getStatusLine(pe).setMessage(
+						KImage.getImage(KImage.IMG_OK_STATUS),
+						"File " + fileName + " created successfully");
+				return true;
+			}
+		} catch (IOException e) {
+			KWindow.getStatusLine(pe).setMessage(
+					KImage.getImage(KImage.IMG_ERR_STATUS),
+					"Error creating file");
+		}
+		return false;
 	}
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		// TODO Auto-generated method stub
-		
 	}
 }

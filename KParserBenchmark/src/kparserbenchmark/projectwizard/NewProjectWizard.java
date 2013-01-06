@@ -16,22 +16,34 @@
 
 package kparserbenchmark.projectwizard;
 
+import kparserbenchmark.application.Application;
 import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.ProjectExplorer;
+import kparserbenchmark.projectexplorer.Workspace;
+import kparserbenchmark.utils.KImage;
+import kparserbenchmark.utils.KWindow;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * Creates new project wizard
  * 
  * @author kopson
  */
-public class NewProjectWizard extends Wizard {
+public class NewProjectWizard extends Wizard implements
+		org.eclipse.ui.INewWizard {
+
+	// The command ID
+	public static final String ID = "KParserBenchmark.NewProjectWizard";
 
 	// Wizard pages
 	protected NewProjectPage one;
-
-	// Created project
-	private Project proj;
 
 	/**
 	 * The constructor
@@ -49,13 +61,30 @@ public class NewProjectWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
-		proj = new Project(one.getProjectName(), one.getProjectType(),
+		Project proj = new Project(one.getProjectName(), one.getProjectType(),
 				one.getProjectPath(), one.getProjectSummary(),
 				one.getProjectDescription());
+
+		if (proj == null || !proj.create())
+			KWindow.getStatusLine(KWindow.getView(ProjectExplorer.ID))
+					.setMessage(KImage.getImage(KImage.IMG_ERR_STATUS),
+							"Error creating project");
+		else {
+			Workspace.getInstance().setCurrProject(proj);
+
+			IViewPart view = KWindow.getView(ProjectExplorer.ID);
+			((ProjectExplorer) view).refreshView();
+			KWindow.getStatusLine(KWindow.getView(ProjectExplorer.ID))
+					.setMessage(
+							KImage.getImage(KImage.IMG_OK_STATUS),
+							"Project " + proj.getName()
+									+ " created successfully");
+		}
 		return true;
 	}
 
-	public Project getProj() {
-		return proj;
+	@Override
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		// TODO Auto-generated method stub
 	}
 }

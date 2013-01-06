@@ -3,7 +3,6 @@ package kparserbenchmark.projectexplorer;
 import java.util.logging.Logger;
 
 import kparserbenchmark.commands.OpenProjectAction;
-import kparserbenchmark.commands.ProjectWizardHandler;
 import kparserbenchmark.commands.RefreshProjectAction;
 import kparserbenchmark.commands.ScriptEditorAction;
 import kparserbenchmark.projectexplorer.Project.Status;
@@ -14,20 +13,27 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IFontDecorator;
+import org.eclipse.jface.viewers.ILabelDecorator;
+import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.TreeEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -35,7 +41,7 @@ import org.eclipse.ui.part.ViewPart;
  * 
  * @author kopson
  */
-public class ProjectExplorer extends ViewPart {
+public class ProjectExplorer extends ViewPart implements IWorkspaceListener {
 
 	// Logger instance
 	private final static Logger LOG = Logger.getLogger(ProjectExplorer.class
@@ -83,7 +89,10 @@ public class ProjectExplorer extends ViewPart {
 		viewer = new ProjectTreeViewer(parent, SWT.MULTI | SWT.H_SCROLL
 				| SWT.V_SCROLL);
 		viewer.setContentProvider(new ProjectContentProvider());
-		viewer.setLabelProvider(new ProjectLabelProvider());
+		ProjectLabelProvider labelProvider = new ProjectLabelProvider();
+		
+		viewer.setLabelProvider(labelProvider);
+		
 		// Expand the tree
 		viewer.setAutoExpandLevel(1);
 		// Provide the input to the ContentProvider
@@ -123,7 +132,7 @@ public class ProjectExplorer extends ViewPart {
 				}
 			}
 		});
-
+		
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 
 			@Override
@@ -195,7 +204,7 @@ public class ProjectExplorer extends ViewPart {
 	}
 
 	/**
-	 * Update status line after reading workspace 
+	 * Update status line after reading workspace
 	 */
 	private void updateStatusLine() {
 		String statusMessage = Workspace.getInstance().getError();
@@ -206,5 +215,16 @@ public class ProjectExplorer extends ViewPart {
 			KWindow.getStatusLine(this).setMessage(
 					KImage.getImage(KImage.IMG_OK_STATUS),
 					"Loaded workspace: " + Workspace.getInstance().getPath());
+	}
+
+	@Override
+	public void dispose() {
+		super.dispose();
+
+	}
+
+	@Override
+	public void activeProjectChanged() {
+		viewer.refresh(true);
 	}
 }

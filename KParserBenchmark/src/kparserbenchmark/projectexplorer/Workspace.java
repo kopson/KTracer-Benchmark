@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import kparserbenchmark.consoleView.IConsoleListener;
 import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.core.runtime.Assert;
@@ -32,22 +33,30 @@ public final class Workspace {
 	// Implementation of Singleton Pattern
 	private static Workspace Instance;
 
+	// Current active project
+	private static Project currProject;
+
+	// Default workspace name
+	public static final String KWorkspace = "kworkspace";
+
 	// String constants
 	private static final String invProj_err1 = "Invalid project(s) in workspace";
 
 	// Workspace keeps error value internally because if occurs errors during
 	// loading projects
 	// from workspace we cannot update status line - it is not created yet. We
-	// have to put off
-	// this until ProjectExplorer view will be created.
+	// have to put off this until ProjectExplorer view will be created.
 	private int hasErrors;
+
+	/** Workspace listeners list */
+	List<IWorkspaceListener> workspaceListeners;
 
 	/**
 	 * Private constructor
 	 */
 	private Workspace() {
 
-		KWindow.getPrefs2().addPropertyChangeListener(
+		KWindow.getPrefs().addPropertyChangeListener(
 				new IPropertyChangeListener() {
 					@Override
 					public void propertyChange(PropertyChangeEvent event) {
@@ -142,5 +151,26 @@ public final class Workspace {
 
 	public void setPath(String path) {
 		this.path = path;
+	}
+
+	public static Project getCurrProject() {
+		return currProject;
+	}
+
+	public void setCurrProject(Project project) {
+		currProject = project;
+		notifyListeners();
+	}
+
+	public void addConsoleListener(IWorkspaceListener workspaceListener) {
+		if (workspaceListener != null)
+			workspaceListeners.add(workspaceListener);
+	}
+
+	private void notifyListeners() {
+		if (workspaceListeners != null)
+			for (IWorkspaceListener workspaceListener : workspaceListeners) {
+				workspaceListener.activeProjectChanged();
+			}
 	}
 }

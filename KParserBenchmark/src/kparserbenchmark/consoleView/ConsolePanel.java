@@ -19,6 +19,7 @@ package kparserbenchmark.consoleView;
 import java.util.logging.Logger;
 
 import kparserbenchmark.application.Application;
+import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.KFile;
 import kparserbenchmark.utils.KImage;
 import kparserbenchmark.utils.KWindow;
@@ -70,8 +71,8 @@ public class ConsolePanel extends ViewPart implements IConsoleListener {
 			public void run() {
 				String path = null;
 
-				if (Application.getCurrProject() != null)
-					path = Application.getCurrProject().getPath();
+				if (Workspace.getCurrProject() != null)
+					path = Workspace.getCurrProject().getPath();
 
 				String logFile = KWindow.saveFileDialog(path, logFileName,
 						KWindow.LOG);

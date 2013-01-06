@@ -56,7 +56,7 @@
    <extension
          point="org.eclipse.ui.views">
       <view
-            allowMultiple="false"
+            allowMultiple="true"
             class="kparserbenchmark.projectexplorer.ProjectExplorer"
             icon="icons/box_16.png"
             id="KParserBenchmark.projectExplorer"
@@ -64,7 +64,7 @@
             restorable="true">
       </view>
       <view
-            allowMultiple="false"
+            allowMultiple="true"
             class="kparserbenchmark.consoleView.ConsolePanel"
             icon="icons/terminal_16.png"
             id="KParserBenchmark.consoleView"
@@ -149,12 +149,6 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="kparserbenchmark.commands.ProjectWizardHandler"
-            description="Create new project"
-            id="KParserBenchmark.newProjectCommand"
-            name="New Project">
-      </command>
-      <command
             defaultHandler="org.eclipse.ui.internal.handlers.IntroHandler"
             id="KParserBenchmark.welcomeCommand"
             name="Welcome">
@@ -190,12 +184,6 @@
             id="KParserBenchmark.ProjectCategory"
             name="Project Category">
       </category>
-      <command
-            defaultHandler="kparserbenchmark.commands.ProjectFileWizardHandler"
-            description="Create new file"
-            id="KParserBenchmark.NewFileCommand"
-            name="New File...">
-      </command>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -245,11 +233,6 @@
                   label="Set workspace"
                   style="push">
             </command>
-            <command
-                  commandId="KParserBenchmark.newProjectCommand"
-                  label="New Project"
-                  style="push">
-            </command>
          </menu>
          <menu
                id="KParserBenchmark.helpMenu"
@@ -282,21 +265,6 @@
       </initializer>
    </extension>
    <extension
-         point="org.eclipse.ui.bindings">
-      <key
-            commandId="KParserBenchmark.newProjectCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+M2+P">
-      </key>
-      <key
-            commandId="KParserBenchmark.exitCommand"
-            contextId="org.eclipse.ui.contexts.window"
-            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-            sequence="M1+Q">
-      </key>
-   </extension>
-   <extension
          point="org.eclipse.ui.newWizards">
       <category
             id="KParserBenchmark.WizardCategory"
@@ -304,17 +272,29 @@
       </category>
       <wizard
             category="KParserBenchmark.WizardCategory"
-            class="kparserbenchmark.projectwizard.NewProjectFileWizard"
+            class="kparserbenchmark.projectwizard.NewProjectWizard"
             finalPerspective="KParserBenchmark.perspective"
             icon="icons/open_16.png"
             id="KParserBenchmark.NewProjectWizard"
             name="New  Project">
       </wizard>
       <wizard
-            class="kparserbenchmark.NewWizard2"
-            id="KParserBenchmark.wizard2"
-            name="name">
+            category="KParserBenchmark.WizardCategory"
+            class="kparserbenchmark.projectwizard.NewProjectFileWizard"
+            finalPerspective="KParserBenchmark.perspective"
+            icon="icons/document_16.png"
+            id="KParserBenchmark.NewFileWizard"
+            name="New File">
       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="KParserBenchmark.exitCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+            sequence="M1+Q">
+      </key>
    </extension>
 
 </plugin>

@@ -17,6 +17,8 @@
 package kparserbenchmark.commands;
 
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.KFile;
@@ -54,14 +56,17 @@ import org.eclipse.swt.widgets.Text;
  */
 public class SetWorkspaceHandler implements IHandler {
 
+	/**
+	 * Logger
+	 */
+	private static final Logger LOG = Logger.getLogger(SetWorkspaceHandler.class.getSimpleName());
+	
 	@Override
 	public void addHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -77,8 +82,7 @@ public class SetWorkspaceHandler implements IHandler {
 					try {
 						KFile.removeDirectoryRecursive(oldWorkspace);
 					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.log(Level.WARNING, e.getMessage());
 					}
 				}
 				Workspace.getInstance().createDefaultWorkspace(newWorkspace);
@@ -99,7 +103,6 @@ public class SetWorkspaceHandler implements IHandler {
 
 	@Override
 	public void removeHandlerListener(IHandlerListener handlerListener) {
-		// TODO Auto-generated method stub
 
 	}
 
@@ -253,7 +256,9 @@ public class SetWorkspaceHandler implements IHandler {
 			return container;
 		}
 
-		//Check if warning button should be displayed
+		/**
+		 * Check if warning button should be displayed
+		 */
 		private void checkWarning() {
 			if(checkButton.getSelection() && KFile.checkWorkspaceNotEmpty(nameText.getText())) {
 				warning.setVisible(true);

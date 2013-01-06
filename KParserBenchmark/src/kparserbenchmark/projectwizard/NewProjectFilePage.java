@@ -18,6 +18,9 @@ package kparserbenchmark.projectwizard;
 
 import java.io.File;
 
+import kparserbenchmark.application.Application;
+import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.DuplicatedPathException;
 import kparserbenchmark.utils.InvalidPathException;
 import kparserbenchmark.utils.KFile;
@@ -28,6 +31,8 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -49,6 +54,9 @@ public class NewProjectFilePage extends WizardPage {
 	// Global error in dialog input data
 	private int invalidData;
 	
+	//Event source string
+	private String string;
+		
 	//Error flags
 	private static final int NO_ERROR 	= 0x0000;
 	private static final int NAME_ERROR = 0x000F;
@@ -117,16 +125,96 @@ public class NewProjectFilePage extends WizardPage {
 		});
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		fileName.setLayoutData(gd);
+		
+		Label filePathLabel = new Label(container, SWT.NULL);
+		filePathLabel.setText("Path: ");
+
+		Composite subContainer = new Composite(container, SWT.NULL);
+		GridLayout subLayout = new GridLayout();
+		subLayout.numColumns = 3;
+		subContainer.setLayout(subLayout);
+		
+		filePath = new Text(subContainer, SWT.BORDER | SWT.SINGLE);
+		Project p = Workspace.getCurrProject();
+		String basePath;
+		if (p == null)
+			basePath = Workspace.getInstance().getPath();
+		else 
+			basePath = p.getPath();
+		
+		filePath.setText(basePath);
+		filePath.setEnabled(true);
+		string = filePath.getText();
+		
+		final ControlDecoration pathDecorator = KWindow.createLabelDecoration(
+				filePath, fileNameValidator);
+
+		new Label(subContainer, SWT.NONE);
+		Button button = new Button(subContainer, SWT.PUSH);
+		button.setText("Browse...");
+		button.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				String dir = KWindow.openDirectoryDialog(filePath.getText());
+				if (dir != null) {
+					filePath.setText(dir);
+				}
+			}
+		});
+
+		filePath.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				string = ((Text) e.getSource()).getText();
+				checkPath(pathDecorator);
+			}
+
+		});
+
+		filePath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		subContainer.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		setControl(container);
 		setPageComplete(false);
 	}
 
+	/**
+	 * Check if project path is valid
+	 * 
+	 * @param txtDecorator Validation decoration
+	 */
+	private void checkPath(ControlDecoration txtDecorator) {
+		KFile f = new KFile(string);
+		try {
+			if (f.isPathNameValid()) {
+				txtDecorator.hide();
+				invalidData &= ~PATH_ERROR;
+			}
+		} catch (DuplicatedPathException e1) {
+			txtDecorator.hide();
+			invalidData &= ~PATH_ERROR;
+		} catch (InvalidPathException e1) {
+			txtDecorator.setDescriptionText(fileNameValidator);
+			txtDecorator.show();
+			invalidData |= PATH_ERROR;
+		}
+		checkIsComplete();
+	}
+	
 	private boolean checkIsComplete() {
 		boolean ret = true;
 
 		if (invalidData != 0) {
 			ret = false;
 			setDescription(description4);
+		}
+
+		if (filePath.getText().isEmpty()) {
+			setDescription(description3);
+			ret = false;
 		}
 
 		if (fileName.getText().isEmpty()) {

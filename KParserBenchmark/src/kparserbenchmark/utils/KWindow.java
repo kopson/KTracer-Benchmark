@@ -42,9 +42,12 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -73,9 +76,15 @@ public class KWindow {
 	public static final int ALL = 0xFFFF;
 
 	/**
+	 * Counter for showView() method
+	 */
+	private static int instanceNum;
+
+	/**
 	 * This class should be never instantiate
 	 */
 	private KWindow() {
+		instanceNum = 0;
 	}
 
 	/**
@@ -270,8 +279,10 @@ public class KWindow {
 	/**
 	 * Add decoration to text field
 	 * 
-	 * @param owner Text field that owns decoration
-	 * @param name Text displayed when decoration is shown
+	 * @param owner
+	 *            Text field that owns decoration
+	 * @param name
+	 *            Text displayed when decoration is shown
 	 * @return Returns decorator object
 	 */
 	public static ControlDecoration createLabelDecoration(Text owner,
@@ -287,8 +298,53 @@ public class KWindow {
 		txtDecorator.hide();
 		return txtDecorator;
 	}
-	
-	public static IPreferenceStore getPrefs2() {
+
+	/**
+	 * Get default preferences
+	 * 
+	 * @return Returns preferences
+	 */
+	public static IPreferenceStore getPrefs() {
 		return Activator.getDefault().getPreferenceStore();
+	}
+
+	/**
+	 * Set active handler for wizard
+	 * 
+	 * @param wizardId
+	 *            Wizard ID
+	 * @param handler
+	 *            New handler
+	 */
+	public static void setWizardHandler(String wizardId, AbstractHandler handler) {
+		IHandlerService hs = (IHandlerService) PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getService(IHandlerService.class);
+		hs.activateHandler(wizardId, handler);
+	}
+
+	/**
+	 * Show view action
+	 * 
+	 * @param window
+	 *            Window
+	 * @param viewId
+	 *            View ID
+	 * @return Returns view
+	 */
+	public static IViewPart showView(IWorkbenchWindow window, String viewId) {
+		IViewPart view = null;
+		try {
+			IWorkbenchPage page = window.getActivePage();
+			view = getView(viewId);
+			if (view == null) {
+				view = page.showView(viewId, Integer.toString(instanceNum),
+						IWorkbenchPage.VIEW_ACTIVATE);
+				instanceNum++;
+			}
+		} catch (PartInitException e) {
+			LOGe.log(Level.SEVERE, e.getMessage());
+			e.printStackTrace();
 		}
+		return view;
+	}
 }

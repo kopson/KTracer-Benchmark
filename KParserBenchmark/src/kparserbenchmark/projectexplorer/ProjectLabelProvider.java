@@ -3,9 +3,12 @@ package kparserbenchmark.projectexplorer;
 import kparserbenchmark.projectexplorer.Project.Status;
 import kparserbenchmark.utils.KImage;
 
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * Project explorer label provider
@@ -13,9 +16,10 @@ import org.eclipse.jface.viewers.ViewerCell;
  * @author kopson
  */
 public class ProjectLabelProvider extends StyledCellLabelProvider {
-
+	
 	@Override
 	public void update(ViewerCell cell) {
+		
 		Object element = cell.getElement();
 		StyledString text = new StyledString();
 
@@ -30,6 +34,9 @@ public class ProjectLabelProvider extends StyledCellLabelProvider {
 						KImage.IMG_PROJECT_CLOSED).createImage());
 			text.append(" (" + project.getElements().size() + ") ",
 					StyledString.COUNTER_STYLER);
+			if(project.equals(Workspace.getCurrProject()))
+				cell.setFont(JFaceResources.getFontRegistry().
+						getBold(JFaceResources.DEFAULT_FONT));
 		} else {
 			Category category = (Category) element;
 			text.append(category.getName());
