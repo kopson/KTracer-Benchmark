@@ -16,9 +16,25 @@ import kparserbenchmark.utils.KWindow;
  */
 public class Project {
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (obj instanceof Project) {
+			if (((Project) obj).name.equals(this.name)
+					&& ((Project) obj).path.equals(this.path)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
 	// Logger instance
 	private static final Logger LOG = Logger.getLogger(Project.class.getName());
-		
+
 	// Obligatory attributes
 	private String name;
 	private Types type;
@@ -181,6 +197,15 @@ public class Project {
 				: 1;
 
 		return fail == 0 ? true : false;
+	}
+
+	/**
+	 * Open ask for delete dialog
+	 */
+	public void checkDelete() {
+		boolean hard = KWindow.openQuestionDialog("Delete Project",
+				"Remove project source from workspace?");
+		delete(hard);
 	}
 
 	/**

@@ -39,5 +39,4 @@ public class DuplicatedPathException extends IOException {
 	public DuplicatedPathException(String path) {
 		super("Path: " + path + " already exists");	
 	}
-
 }

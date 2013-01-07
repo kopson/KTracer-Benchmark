@@ -342,6 +342,5 @@ public class Console extends StyledText {
 		default:
 			assert (false);
 		}
-
 	}
 }

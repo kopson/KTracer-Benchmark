@@ -276,15 +276,23 @@
             finalPerspective="KParserBenchmark.perspective"
             icon="icons/open_16.png"
             id="KParserBenchmark.NewProjectWizard"
-            name="New  Project">
+            name="Project">
       </wizard>
       <wizard
             category="KParserBenchmark.WizardCategory"
-            class="kparserbenchmark.projectwizard.NewProjectFileWizard"
+            class="kparserbenchmark.projectwizard.NewFileWizard"
             finalPerspective="KParserBenchmark.perspective"
-            icon="icons/document_16.png"
+            icon="icons/document_add_16.png"
             id="KParserBenchmark.NewFileWizard"
-            name="New File">
+            name="File">
+      </wizard>
+      <wizard
+            category="KParserBenchmark.WizardCategory"
+            class="kparserbenchmark.projectwizard.NewDirectoryWizard"
+            finalPerspective="KParserBenchmark.perspective"
+            icon="icons/folder_add_16.png"
+            id="KParserBenchmark.NewDirectoryWizard"
+            name="Directory">
       </wizard>
    </extension>
    <extension

@@ -38,5 +38,4 @@ public class InvalidPathException extends IOException {
 	public InvalidPathException(String path) {
 		super("Path: " + path + " is invalid");	
 	}
-
 }

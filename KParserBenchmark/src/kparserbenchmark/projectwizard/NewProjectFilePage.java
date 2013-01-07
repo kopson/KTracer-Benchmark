@@ -18,15 +18,18 @@ package kparserbenchmark.projectwizard;
 
 import java.io.File;
 
-import kparserbenchmark.application.Application;
 import kparserbenchmark.projectexplorer.Project;
 import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.DuplicatedPathException;
+import kparserbenchmark.utils.FileBrowser;
 import kparserbenchmark.utils.InvalidPathException;
 import kparserbenchmark.utils.KFile;
 import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
@@ -53,15 +56,15 @@ public class NewProjectFilePage extends WizardPage {
 
 	// Global error in dialog input data
 	private int invalidData;
-	
-	//Event source string
+
+	// Event source string
 	private String string;
-		
-	//Error flags
-	private static final int NO_ERROR 	= 0x0000;
+
+	// Error flags
+	// private static final int NO_ERROR = 0x0000;
 	private static final int NAME_ERROR = 0x000F;
 	private static final int PATH_ERROR = 0x00F0;
-		
+
 	/** String constants */
 	private static final String fileNameValidator = "Please use only letters and digits";
 	private static final String fileNameDupVal = "File with this name already exists";
@@ -69,7 +72,7 @@ public class NewProjectFilePage extends WizardPage {
 	private static final String description3 = "Set KTrace project path";
 	private static final String description4 = "Invalid input data";
 	private static final String description = "Create new file";
-	
+
 	/**
 	 * The constructor
 	 */
@@ -98,7 +101,6 @@ public class NewProjectFilePage extends WizardPage {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				// TODO Auto-generated method stub
 			}
 
 			@Override
@@ -125,7 +127,7 @@ public class NewProjectFilePage extends WizardPage {
 		});
 		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
 		fileName.setLayoutData(gd);
-		
+
 		Label filePathLabel = new Label(container, SWT.NULL);
 		filePathLabel.setText("Path: ");
 
@@ -133,19 +135,19 @@ public class NewProjectFilePage extends WizardPage {
 		GridLayout subLayout = new GridLayout();
 		subLayout.numColumns = 3;
 		subContainer.setLayout(subLayout);
-		
+
 		filePath = new Text(subContainer, SWT.BORDER | SWT.SINGLE);
 		Project p = Workspace.getCurrProject();
 		String basePath;
 		if (p == null)
 			basePath = Workspace.getInstance().getPath();
-		else 
+		else
 			basePath = p.getPath();
-		
+
 		filePath.setText(basePath);
 		filePath.setEnabled(true);
 		string = filePath.getText();
-		
+
 		final ControlDecoration pathDecorator = KWindow.createLabelDecoration(
 				filePath, fileNameValidator);
 
@@ -177,6 +179,30 @@ public class NewProjectFilePage extends WizardPage {
 
 		filePath.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		subContainer.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+
+		new Label(container, SWT.NONE);
+		Composite fileContainer = new Composite(container, SWT.SINGLE
+				| SWT.BORDER);
+		fileContainer.setLayout(new GridLayout());
+		FileBrowser browser = new FileBrowser(fileContainer, basePath);
+		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+		gridData.horizontalSpan = 2;
+		fileContainer.setLayoutData(gridData);
+		browser.getTree().setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		browser.addDoubleClickListener(new IDoubleClickListener() {
+
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				File selectedNode = (File) ((IStructuredSelection) event
+						.getSelection()).getFirstElement();
+				
+				if (selectedNode.isFile())
+					fileName.setText(selectedNode.getName());
+				else
+					filePath.setText(selectedNode.getPath());
+			}
+		});
+
 		setControl(container);
 		setPageComplete(false);
 	}
@@ -184,7 +210,8 @@ public class NewProjectFilePage extends WizardPage {
 	/**
 	 * Check if project path is valid
 	 * 
-	 * @param txtDecorator Validation decoration
+	 * @param txtDecorator
+	 *            Validation decoration
 	 */
 	private void checkPath(ControlDecoration txtDecorator) {
 		KFile f = new KFile(string);
@@ -203,7 +230,12 @@ public class NewProjectFilePage extends WizardPage {
 		}
 		checkIsComplete();
 	}
-	
+
+	/**
+	 * Check if all mandatory attributes were set
+	 * 
+	 * @return Returns true if all mandatory fields are complete false otherwise
+	 */
 	private boolean checkIsComplete() {
 		boolean ret = true;
 
@@ -221,7 +253,7 @@ public class NewProjectFilePage extends WizardPage {
 			setDescription(description2);
 			ret = false;
 		}
-		
+
 		if (ret) {
 			setDescription(description);
 			setPageComplete(true);
@@ -230,7 +262,12 @@ public class NewProjectFilePage extends WizardPage {
 		return ret;
 	}
 
+	/**
+	 * Get full file name
+	 * 
+	 * @return Path and file name
+	 */
 	public String getFileName() {
-		return fileName.getText();
+		return filePath.getText() + File.pathSeparator + fileName.getText();
 	}
 }

@@ -59,18 +59,18 @@ public class NewProjectPage extends WizardPage {
 
 	// Global error in dialog input data
 	private int invalidData;
-	
-	//Error flags
-	private static final int NO_ERROR 	= 0x0000;
+
+	// Error flags
+	private static final int NO_ERROR = 0x0000;
 	private static final int NAME_ERROR = 0x000F;
 	private static final int PATH_ERROR = 0x00F0;
-	
+
 	// Widget container
 	private Composite container;
 
-	//Event source string
+	// Event source string
 	private String string;
-	
+
 	// Page labels
 	private static final String title = "New project wizard";
 	private static final String description = "Create new KTrace project";
@@ -138,7 +138,8 @@ public class NewProjectPage extends WizardPage {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				String string = ((Text) e.getSource()).getText();
-				KFile f = new KFile(projectPath.getText() + File.separator + string);
+				KFile f = new KFile(projectPath.getText() + File.separator
+						+ string);
 				try {
 					if (f.isNameValid()) {
 						txtDecorator.hide();
@@ -167,10 +168,10 @@ public class NewProjectPage extends WizardPage {
 	private void createProjectPath() {
 		Label projectDefaultPathLabel = new Label(container, SWT.NULL);
 		projectDefaultPathLabel.setText("");
-		
+
 		final Button checkButton = new Button(container, SWT.CHECK);
 		checkButton.setText(defaultPathLabel);
-		
+
 		Label projectPathLabel = new Label(container, SWT.NULL);
 		projectPathLabel.setText(pathLabel);
 
@@ -178,12 +179,12 @@ public class NewProjectPage extends WizardPage {
 		GridLayout subLayout = new GridLayout();
 		subLayout.numColumns = 3;
 		subContainer.setLayout(subLayout);
-		
+
 		projectPath = new Text(subContainer, SWT.BORDER | SWT.SINGLE);
 		projectPath.setText(Workspace.getInstance().getPath());
 		projectPath.setEnabled(false);
 		string = projectPath.getText();
-		
+
 		final ControlDecoration txtDecorator = KWindow.createLabelDecoration(
 				projectPath, projectNameValidator);
 
@@ -236,7 +237,8 @@ public class NewProjectPage extends WizardPage {
 	/**
 	 * Check if project path is valid
 	 * 
-	 * @param txtDecorator Validation decoration
+	 * @param txtDecorator
+	 *            Validation decoration
 	 */
 	private void checkPath(ControlDecoration txtDecorator) {
 		KFile f = new KFile(string);
@@ -297,6 +299,8 @@ public class NewProjectPage extends WizardPage {
 
 	/**
 	 * Check if all mandatory attributes were set
+	 * 
+	 * @return Returns true if all mandatory fields are complete false otherwise
 	 */
 	private boolean checkIsComplete() {
 		boolean ret = true;

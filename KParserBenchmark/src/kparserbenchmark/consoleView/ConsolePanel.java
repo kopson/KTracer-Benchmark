@@ -18,7 +18,6 @@ package kparserbenchmark.consoleView;
 
 import java.util.logging.Logger;
 
-import kparserbenchmark.application.Application;
 import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.KFile;
 import kparserbenchmark.utils.KImage;
@@ -138,7 +137,6 @@ public class ConsolePanel extends ViewPart implements IConsoleListener {
 	@Override
 	public void processStarted() {
 		stopAction.setEnabled(true);
-		
 	}
 
 	@Override

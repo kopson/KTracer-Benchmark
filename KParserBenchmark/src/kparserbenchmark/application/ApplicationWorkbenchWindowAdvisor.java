@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import kparserbenchmark.projectwizard.NewDirectoryWizard;
+import kparserbenchmark.projectwizard.NewFileWizard;
+import kparserbenchmark.projectwizard.NewProjectWizard;
 import kparserbenchmark.utils.KImage;
 
 import org.eclipse.swt.graphics.Image;
@@ -111,9 +114,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 	private static final List<String> FILE_NEW__ALLOWED_WIZARDS = Collections
 			.unmodifiableList(Arrays.asList(new String[] {
 			// "org.eclipse.ui.Basic",// Basic wizards
-			"KParserBenchmark.NewProjectWizard", // User wizards
-			"KParserBenchmark.NewFolderWizard", // User wizards
-			"KParserBenchmark.NewFileWizard", // User wizards
+			NewProjectWizard.ID, // User wizards
+			NewFileWizard.ID, // User wizards
+			NewDirectoryWizard.ID, // User wizards
 			}));
 
 	/**

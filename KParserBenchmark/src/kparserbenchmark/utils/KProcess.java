@@ -43,6 +43,8 @@ public class KProcess extends Thread {
 	private String processCommand;
 
 	/** External process command arguments */
+	@SuppressWarnings("unused")
+	//TODO: Add command argument handling
 	private String[] processArgs;
 
 	/** External process result */

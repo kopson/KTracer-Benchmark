@@ -32,7 +32,7 @@ import org.eclipse.ui.IWorkbench;
  * 
  * @author kopson
  */
-public class NewProjectFileWizard extends Wizard implements
+public class NewFileWizard extends Wizard implements
 		org.eclipse.ui.INewWizard {
 
 	// The command ID
@@ -44,7 +44,7 @@ public class NewProjectFileWizard extends Wizard implements
 	/**
 	 * The constructor
 	 */
-	public NewProjectFileWizard() {
+	public NewFileWizard() {
 		super();
 		setNeedsProgressMonitor(true);
 	}

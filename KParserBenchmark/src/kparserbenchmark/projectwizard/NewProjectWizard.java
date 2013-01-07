@@ -16,7 +16,6 @@
 
 package kparserbenchmark.projectwizard;
 
-import kparserbenchmark.application.Application;
 import kparserbenchmark.projectexplorer.Project;
 import kparserbenchmark.projectexplorer.ProjectExplorer;
 import kparserbenchmark.projectexplorer.Workspace;
@@ -24,12 +23,9 @@ import kparserbenchmark.utils.KImage;
 import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PlatformUI;
 
 /**
  * Creates new project wizard
@@ -85,6 +81,5 @@ public class NewProjectWizard extends Wizard implements
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		// TODO Auto-generated method stub
 	}
 }

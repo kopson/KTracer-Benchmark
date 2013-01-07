@@ -1,3 +1,19 @@
+/*******************************************************************************
+ Copyright (c) 2012 kopson kopson.piko@gmail.com
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ *******************************************************************************/
+
 package kparserbenchmark.projectexplorer;
 
 import java.io.File;
@@ -6,7 +22,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import kparserbenchmark.consoleView.IConsoleListener;
 import kparserbenchmark.utils.KWindow;
 
 import org.eclipse.core.runtime.Assert;
@@ -48,23 +63,20 @@ public final class Workspace {
 	// have to put off this until ProjectExplorer view will be created.
 	private int hasErrors;
 
-	/** Workspace listeners list */
-	List<IWorkspaceListener> workspaceListeners;
-
 	/**
 	 * Private constructor
 	 */
 	private Workspace() {
 
 		KWindow.getPrefs().addPropertyChangeListener(
-				new IPropertyChangeListener() {
-					@Override
-					public void propertyChange(PropertyChangeEvent event) {
-						if (event.getProperty() == "MySTRING1") {
-							path = event.getNewValue().toString();
-						}
+			new IPropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent event) {
+					if (event.getProperty() == "MySTRING1") {
+						path = event.getNewValue().toString();
 					}
-				});
+				}
+			});
 	}
 
 	/**
@@ -159,18 +171,5 @@ public final class Workspace {
 
 	public void setCurrProject(Project project) {
 		currProject = project;
-		notifyListeners();
-	}
-
-	public void addConsoleListener(IWorkspaceListener workspaceListener) {
-		if (workspaceListener != null)
-			workspaceListeners.add(workspaceListener);
-	}
-
-	private void notifyListeners() {
-		if (workspaceListeners != null)
-			for (IWorkspaceListener workspaceListener : workspaceListeners) {
-				workspaceListener.activeProjectChanged();
-			}
 	}
 }

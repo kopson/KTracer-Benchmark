@@ -5,31 +5,22 @@ import java.util.logging.Logger;
 import kparserbenchmark.commands.OpenProjectAction;
 import kparserbenchmark.commands.RefreshProjectAction;
 import kparserbenchmark.commands.ScriptEditorAction;
-import kparserbenchmark.projectexplorer.Project.Status;
 import kparserbenchmark.utils.KImage;
 import kparserbenchmark.utils.KWindow;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.IFontDecorator;
-import org.eclipse.jface.viewers.ILabelDecorator;
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.TreeEvent;
-import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -41,42 +32,18 @@ import org.eclipse.ui.part.ViewPart;
  * 
  * @author kopson
  */
-public class ProjectExplorer extends ViewPart implements IWorkspaceListener {
+public class ProjectExplorer extends ViewPart {
 
 	// Logger instance
+	@SuppressWarnings("unused")
 	private final static Logger LOG = Logger.getLogger(ProjectExplorer.class
 			.getName());
-
-	/**
-	 * Tree viewer with custom expanding handling
-	 */
-	public class ProjectTreeViewer extends TreeViewer {
-
-		/**
-		 * The constructor - same as for base class
-		 * 
-		 * @param parent
-		 * @param i
-		 */
-		public ProjectTreeViewer(Composite parent, int i) {
-			super(parent, i);
-		}
-
-		@Override
-		protected void handleTreeExpand(TreeEvent event) {
-			Object o = event.item.getData();
-			if (o instanceof Project
-					&& ((Project) o).getCurrStatus() == Status.OPENED)
-				super.handleTreeExpand(event);
-		}
-
-	}
 
 	// View ID
 	public static final String ID = "KParserBenchmark.projectExplorer";
 
 	// View main control object
-	private ProjectTreeViewer viewer;
+	private TreeViewer viewer;
 
 	/**
 	 * The constructor
@@ -86,13 +53,12 @@ public class ProjectExplorer extends ViewPart implements IWorkspaceListener {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		viewer = new ProjectTreeViewer(parent, SWT.MULTI | SWT.H_SCROLL
-				| SWT.V_SCROLL);
+		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.setContentProvider(new ProjectContentProvider());
 		ProjectLabelProvider labelProvider = new ProjectLabelProvider();
-		
+
 		viewer.setLabelProvider(labelProvider);
-		
+
 		// Expand the tree
 		viewer.setAutoExpandLevel(1);
 		// Provide the input to the ContentProvider
@@ -124,6 +90,7 @@ public class ProjectExplorer extends ViewPart implements IWorkspaceListener {
 						manager.add(refreshProjectAction);
 						manager.add(new Separator(
 								IWorkbenchActionConstants.MB_ADDITIONS));
+						manager.add(new SetProjectAction());
 					} else if (selection.getFirstElement() instanceof Category) {
 						manager.add(runEditorAction);
 						manager.add(new Separator(
@@ -132,7 +99,7 @@ public class ProjectExplorer extends ViewPart implements IWorkspaceListener {
 				}
 			}
 		});
-		
+
 		viewer.addDoubleClickListener(new IDoubleClickListener() {
 
 			@Override
@@ -159,8 +126,12 @@ public class ProjectExplorer extends ViewPart implements IWorkspaceListener {
 					final IStructuredSelection selection = (IStructuredSelection) viewer
 							.getSelection();
 					if (selection.getFirstElement() instanceof Project) {
-						// Project o = (Project) selection.getFirstElement();
-						// Project Delete the selected element from the model
+						Project o = (Project) selection.getFirstElement();
+						o.checkDelete();
+						viewer.refresh(true);
+						KWindow.getStatusLine(ProjectExplorer.this).setMessage(
+								KImage.getImage(KImage.IMG_INFO_STATUS),
+								"Deleted project " + o.getName());
 					}
 
 				}
@@ -223,8 +194,39 @@ public class ProjectExplorer extends ViewPart implements IWorkspaceListener {
 
 	}
 
-	@Override
-	public void activeProjectChanged() {
-		viewer.refresh(true);
+	/**
+	 * Set as a main project action
+	 */
+	private class SetProjectAction extends Action implements IWorkbenchAction {
+
+		public SetProjectAction() {
+			setText("SetAsMainProject");
+			setToolTipText("Set as a main project");
+		}
+		
+		@Override
+		public void dispose() {
+
+		}
+
+		@Override
+		public void run() {
+			super.run();
+			Project proj = null;
+			
+			ISelection sel = viewer.getSelection();
+			if (sel instanceof IStructuredSelection) {
+				IStructuredSelection selection = (IStructuredSelection) sel;
+				Object o = selection.getFirstElement();
+				if (selection.size() == 1 && o instanceof Project) {
+					proj = (Project) o;
+				}	
+			}
+			
+			if (proj != null) {
+				Workspace.getInstance().setCurrProject(proj);
+				viewer.refresh(true);
+			}
+		}
 	}
 }

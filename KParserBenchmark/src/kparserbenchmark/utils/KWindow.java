@@ -175,6 +175,18 @@ public class KWindow {
 		MessageDialog.openError(PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getShell(), "Error", errorMsg);
 	}
+	
+	/**
+	 * Display question dialog
+	 * 
+	 * @param title Title
+	 * @param message Question message
+	 * @return @see org.eclipse.jface.dialogs.MessageDialog.openQuestion()
+	 */
+	public static boolean openQuestionDialog(String title, String message) {
+		return MessageDialog.openQuestion(PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getShell(), title, message);
+	}
 
 	/**
 	 * Open directory dialog
