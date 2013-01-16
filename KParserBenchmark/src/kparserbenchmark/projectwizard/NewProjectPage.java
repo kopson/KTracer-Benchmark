@@ -18,7 +18,7 @@ package kparserbenchmark.projectwizard;
 
 import java.io.File;
 
-import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.ProjectNode;
 import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.DuplicatedPathException;
 import kparserbenchmark.utils.InvalidPathException;
@@ -50,7 +50,7 @@ public class NewProjectPage extends WizardPage {
 	// Project attributes
 	private Text projectName;
 	private Text projectPath;
-	private Project.Types projectType;
+	private ProjectNode.ProjectTypes projectType;
 	private Text projectDescription;
 	private Text projectSummary;
 
@@ -324,9 +324,9 @@ public class NewProjectPage extends WizardPage {
 		for (Button button : projectTypes) {
 			if (button.getSelection()) {
 				if (i == 0)
-					projectType = Project.Types.SCHEDULER;
+					projectType = ProjectNode.ProjectTypes.SCHEDULER;
 				else if (i == 1)
-					projectType = Project.Types.TEST;
+					projectType = ProjectNode.ProjectTypes.TEST;
 			}
 			++i;
 		}
@@ -343,7 +343,7 @@ public class NewProjectPage extends WizardPage {
 		return projectName.getText();
 	}
 
-	public Project.Types getProjectType() {
+	public ProjectNode.ProjectTypes getProjectType() {
 		return projectType;
 	}
 

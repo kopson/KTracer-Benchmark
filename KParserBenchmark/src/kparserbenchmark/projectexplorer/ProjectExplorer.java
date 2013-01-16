@@ -2,9 +2,13 @@ package kparserbenchmark.projectexplorer;
 
 import java.util.logging.Logger;
 
+import kparserbenchmark.commands.CopyFileAction;
+import kparserbenchmark.commands.CutFileAction;
 import kparserbenchmark.commands.OpenProjectAction;
+import kparserbenchmark.commands.PasteFileAction;
 import kparserbenchmark.commands.RefreshProjectAction;
 import kparserbenchmark.commands.ScriptEditorAction;
+import kparserbenchmark.editor.ScriptEditorInput;
 import kparserbenchmark.utils.KImage;
 import kparserbenchmark.utils.KWindow;
 
@@ -17,14 +21,28 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.part.EditorInputTransfer;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -45,10 +63,45 @@ public class ProjectExplorer extends ViewPart {
 	// View main control object
 	private TreeViewer viewer;
 
+	private Clipboard clipboard;
+	
+	private GadgetTreeDropAdapter dropAdapter;
+	
 	/**
 	 * The constructor
 	 */
 	public ProjectExplorer() {
+	}
+
+	/**
+	 * Init drag and drop support
+	 * 
+	 * @param viewer
+	 *            Viewer
+	 */
+	protected void initDragAndDrop(final StructuredViewer viewer) {
+		  int ops = DND.DROP_COPY | DND.DROP_MOVE;
+	      Transfer[] transfers = new Transfer[] { GadgetTransfer.getInstance()};
+	      viewer.addDragSupport(ops, transfers, new GadgetDragListener(viewer));
+	      transfers = new Transfer[] {GadgetTransfer.getInstance()};
+	      dropAdapter = new GadgetTreeDropAdapter((TreeViewer) viewer);
+	      viewer.addDropSupport(ops, transfers, dropAdapter);
+	}
+
+	/**
+	 * Init cut and paste support
+	 * 
+	 * @param viewer
+	 */
+	protected void initCutAndPaste(final StructuredViewer viewer) {
+		clipboard = new Clipboard(getSite().getShell().getDisplay());
+		IActionBars bars = getViewSite().getActionBars();
+		bars.setGlobalActionHandler(IWorkbenchActionConstants.CUT,
+				new CutFileAction(viewer, clipboard));
+		bars.setGlobalActionHandler(IWorkbenchActionConstants.COPY,
+				new CopyFileAction(viewer, clipboard));
+		bars.setGlobalActionHandler(IWorkbenchActionConstants.PASTE,
+				new PasteFileAction(viewer, clipboard));
 	}
 
 	@Override
@@ -85,13 +138,13 @@ public class ProjectExplorer extends ViewPart {
 				final IStructuredSelection selection = (IStructuredSelection) viewer
 						.getSelection();
 				if (!selection.isEmpty()) {
-					if (selection.getFirstElement() instanceof Project) {
+					if (selection.getFirstElement() instanceof ProjectNode) {
 						manager.add(openProjectAction);
 						manager.add(refreshProjectAction);
 						manager.add(new Separator(
 								IWorkbenchActionConstants.MB_ADDITIONS));
 						manager.add(new SetProjectAction());
-					} else if (selection.getFirstElement() instanceof Category) {
+					} else if (selection.getFirstElement() instanceof ProjectLeaf) {
 						manager.add(runEditorAction);
 						manager.add(new Separator(
 								IWorkbenchActionConstants.MB_ADDITIONS));
@@ -109,10 +162,10 @@ public class ProjectExplorer extends ViewPart {
 						.getSelection();
 				Object selectedNode = thisSelection.getFirstElement();
 
-				if (selectedNode instanceof Project) {
+				if (selectedNode instanceof ProjectNode) {
 					viewer.setExpandedState(selectedNode,
 							!viewer.getExpandedState(selectedNode));
-				} else if (selectedNode instanceof Category) {
+				} else if (selectedNode instanceof ProjectLeaf) {
 					if (runEditorAction.isEnabled())
 						runEditorAction.run();
 				}
@@ -125,8 +178,8 @@ public class ProjectExplorer extends ViewPart {
 				if (e.keyCode == SWT.DEL) {
 					final IStructuredSelection selection = (IStructuredSelection) viewer
 							.getSelection();
-					if (selection.getFirstElement() instanceof Project) {
-						Project o = (Project) selection.getFirstElement();
+					if (selection.getFirstElement() instanceof ProjectNode) {
+						ProjectNode o = (ProjectNode) selection.getFirstElement();
 						o.checkDelete();
 						viewer.refresh(true);
 						KWindow.getStatusLine(ProjectExplorer.this).setMessage(
@@ -138,6 +191,8 @@ public class ProjectExplorer extends ViewPart {
 			}
 		});
 		updateStatusLine();
+		initDragAndDrop(viewer);
+		initCutAndPaste(viewer);
 	}
 
 	@Override
@@ -165,8 +220,8 @@ public class ProjectExplorer extends ViewPart {
 	public void refreshProj() {
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
-		if (selection.getFirstElement() instanceof Project) {
-			Project p = (Project) selection.getFirstElement();
+		if (selection.getFirstElement() instanceof ProjectNode) {
+			ProjectNode p = (ProjectNode) selection.getFirstElement();
 			boolean exp = viewer.getExpandedState(p);
 			viewer.refresh();
 			viewer.setExpandedState(p, exp);
@@ -191,7 +246,9 @@ public class ProjectExplorer extends ViewPart {
 	@Override
 	public void dispose() {
 		super.dispose();
-
+		if (clipboard != null)
+			clipboard.dispose();
+		clipboard = null;
 	}
 
 	/**
@@ -203,7 +260,7 @@ public class ProjectExplorer extends ViewPart {
 			setText("SetAsMainProject");
 			setToolTipText("Set as a main project");
 		}
-		
+
 		@Override
 		public void dispose() {
 
@@ -212,17 +269,17 @@ public class ProjectExplorer extends ViewPart {
 		@Override
 		public void run() {
 			super.run();
-			Project proj = null;
-			
+			ProjectNode proj = null;
+
 			ISelection sel = viewer.getSelection();
 			if (sel instanceof IStructuredSelection) {
 				IStructuredSelection selection = (IStructuredSelection) sel;
 				Object o = selection.getFirstElement();
-				if (selection.size() == 1 && o instanceof Project) {
-					proj = (Project) o;
-				}	
+				if (selection.size() == 1 && o instanceof ProjectNode) {
+					proj = (ProjectNode) o;
+				}
 			}
-			
+
 			if (proj != null) {
 				Workspace.getInstance().setCurrProject(proj);
 				viewer.refresh(true);

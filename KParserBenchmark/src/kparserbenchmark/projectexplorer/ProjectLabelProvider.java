@@ -1,6 +1,7 @@
 package kparserbenchmark.projectexplorer;
 
-import kparserbenchmark.projectexplorer.Project.Status;
+import kparserbenchmark.projectexplorer.ProjectItem.ItemTypes;
+import kparserbenchmark.projectexplorer.ProjectNode.Status;
 import kparserbenchmark.utils.KImage;
 
 import org.eclipse.jface.resource.JFaceResources;
@@ -21,8 +22,8 @@ public class ProjectLabelProvider extends StyledCellLabelProvider {
 		Object element = cell.getElement();
 		StyledString text = new StyledString();
 
-		if (element instanceof Project) {
-			Project project = (Project) element;
+		if (element instanceof ProjectNode) {
+			ProjectNode project = (ProjectNode) element;
 			text.append(project.getName());
 			if (project.getCurrStatus() == Status.OPENED)
 				cell.setImage(KImage.getImageDescriptor(
@@ -30,10 +31,10 @@ public class ProjectLabelProvider extends StyledCellLabelProvider {
 			else if (project.getCurrStatus() == Status.CLOSED)
 				cell.setImage(KImage.getImageDescriptor(
 						KImage.IMG_PROJECT_CLOSED).createImage());
-			text.append(" (" + project.getElements().size() + ") ",
+			text.append(" (" + project.getChildrenList().size() + ") ",
 					StyledString.COUNTER_STYLER);
 			@SuppressWarnings("unused")
-			Project p = Workspace.getCurrProject();
+			ProjectNode p = Workspace.getCurrProject();
 			if (project.equals(Workspace.getCurrProject()))
 				cell.setFont(JFaceResources.getFontRegistry().getBold(
 						JFaceResources.DEFAULT_FONT));
@@ -42,10 +43,13 @@ public class ProjectLabelProvider extends StyledCellLabelProvider {
 						JFaceResources.DEFAULT_FONT));
 			}
 		} else {
-			Category category = (Category) element;
+			ProjectLeaf category = (ProjectLeaf) element;
 			text.append(category.getName());
 			cell.setImage(KImage.getImageDescriptor(KImage.IMG_PROJECT_FILE)
 					.createImage());
+			if (category.getType() == ItemTypes.CONFIG_FILE)
+				cell.setFont(JFaceResources.getFontRegistry().getItalic(
+						JFaceResources.DEFAULT_FONT));
 		}
 		cell.setText(text.toString());
 		cell.setStyleRanges(text.getStyleRanges());

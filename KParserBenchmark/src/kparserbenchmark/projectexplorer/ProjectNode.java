@@ -1,10 +1,24 @@
+/*******************************************************************************
+ Copyright (c) 2012 kopson kopson.piko@gmail.com
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ *******************************************************************************/
+
 package kparserbenchmark.projectexplorer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,78 +27,73 @@ import kparserbenchmark.utils.KWindow;
 
 /**
  * Controls life cycle of the project
+ * 
+ * Review history: Rev 1: [15.01.2013] Kopson:
+ * 
+ * @author Kopson
  */
-public class Project {
-
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (obj instanceof Project) {
-			if (((Project) obj).name.equals(this.name)
-					&& ((Project) obj).path.equals(this.path)) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
+public class ProjectNode extends ProjectItem {
 
 	// Logger instance
-	private static final Logger LOG = Logger.getLogger(Project.class.getName());
+	private static final Logger LOG = Logger.getLogger(ProjectNode.class
+			.getName());
 
-	// Obligatory attributes
-	private String name;
-	private Types type;
-	private String path;
+	/******* Obligatory attributes *******/
+	// Project type
+	private ProjectTypes projectType;
+	// Project status
+	private Status currStatus;
+	// Project property file
+	private KFile propFile;
+	/*************************************/
 
-	// Optional attributes
+	/******* Optional attributes *******/
+	// Project summary
 	private String summary;
+	// Project description
 	private String description;
 
-	// Project's file list
-	private List<Category> elements = new ArrayList<Category>();
+	/*************************************/
 
 	/**
-	 * Project statuses
+	 * Project types
 	 */
-	public static enum Types {
-		UNKNOWN, SCHEDULER, TEST
+	public static enum ProjectTypes {
+		UNKNOWN, // Project wit no type
+		SCHEDULER, // Scheduler monitor
+		TEST // For test purposes only
 	}
 
 	/**
-	 * Project statuses
+	 * Project statuses used for changing UI interaction in ProjectExplorer view
 	 */
 	public static enum Status {
-		UNKNOWN, OPENED, CLOSED, DELETED
+		UNKNOWN, // Project should newer reach this status
+		OPENED, // Project is opened
+		CLOSED, // Project is closed
+		DELETED // Project is removed from ProjectExplorer view
 	}
 
-	// Project properties
+	/**
+	 * Project properties
+	 */
 	public static enum Properties {
 		Name, Type, Path, Summary, Description, State
 	}
 
-	// Project status
-	private Status currStatus;
-
-	// Project property file
-	private KFile propFile;
-
-	// String constants
+	// Error string constants
 	private static final String errorDup = "Project already exists in selected directory";
 	private static final String errorCreat = "Can't create project in selected directory";
 
-	// Properties file name
-	private static final String properties = ".properties";
-
-	public Project() {
-		name = "";
-		type = Types.UNKNOWN;
-		path = "";
+	/**
+	 * Default constructor
+	 */
+	public ProjectNode() {
+		super(ItemTypes.NODE);
+		projectType = ProjectTypes.UNKNOWN;
 		summary = "";
 		description = "";
+		currStatus = Status.UNKNOWN;
 	}
 
 	/**
@@ -94,10 +103,9 @@ public class Project {
 	 * @param type
 	 * @param path
 	 */
-	public Project(String name, Types type, String path) {
-		this.setName(name);
-		this.setType(type);
-		this.setPath(path);
+	public ProjectNode(String name, ProjectTypes projectType, String path) {
+		super(ItemTypes.NODE, Workspace.getInstance(), path, name);
+		this.projectType = projectType;
 		this.currStatus = Status.OPENED;
 	}
 
@@ -110,11 +118,10 @@ public class Project {
 	 * @param summary
 	 * @param description
 	 */
-	public Project(String name, Types type, String path, String summary,
-			String description) {
-		this.setName(name);
-		this.setType(type);
-		this.setPath(path);
+	public ProjectNode(String name, ProjectTypes projectType, String path,
+			String summary, String description) {
+		super(ItemTypes.NODE, Workspace.getInstance(), path, name);
+		this.projectType = projectType;
 		this.summary = summary;
 		this.description = description;
 		this.currStatus = Status.OPENED;
@@ -187,7 +194,7 @@ public class Project {
 
 		fail += propFile.writeProperty(Properties.Name, name) == true ? 0 : 1;
 		fail += propFile.writeProperty(Properties.Path, path) == true ? 0 : 1;
-		fail += propFile.writeProperty(Properties.Type, type.toString()) == true ? 0
+		fail += propFile.writeProperty(Properties.Type, projectType.toString()) == true ? 0
 				: 1;
 		fail += propFile.writeProperty(Properties.Summary, summary) == true ? 0
 				: 1;
@@ -252,7 +259,8 @@ public class Project {
 				description = properties.readProperty(Properties.Description);
 				currStatus = Status.valueOf(properties
 						.readProperty(Properties.State));
-				type = Types.valueOf(properties.readProperty(Properties.Type));
+				projectType = ProjectTypes.valueOf(properties
+						.readProperty(Properties.Type));
 			} else {
 				return false;
 			}
@@ -262,6 +270,7 @@ public class Project {
 		return true;
 	}
 
+	/********** Getters/Setters **********/
 	public String getSummary() {
 		return summary;
 	}
@@ -278,35 +287,41 @@ public class Project {
 		this.description = description;
 	}
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Types getType() {
-		return type;
-	}
-
-	public void setType(Types type) {
-		this.type = type;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
+	public ProjectTypes getProjectType() {
+		return projectType;
 	}
 
 	public Status getCurrStatus() {
 		return currStatus;
 	}
 
-	public List<Category> getElements() {
-		return elements;
+	/*************************************/
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (obj instanceof ProjectNode) {
+			if (((ProjectNode) obj).name.equals(this.name)
+					&& ((ProjectNode) obj).path.equals(this.path)) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + "Type: " + projectType.name() + "\nStatus: "
+				+ currStatus + "\nProperty File: " + propFile
+				+ "\nDescription: " + description + "\nSummary: " + summary;
+	}
+
+	@Override
+	public int hashCode() {
+		return name.hashCode() + children.hashCode();
 	}
 }

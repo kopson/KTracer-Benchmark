@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import kparserbenchmark.editor.EditorAreaDropAdapter;
 import kparserbenchmark.projectwizard.NewDirectoryWizard;
 import kparserbenchmark.projectwizard.NewFileWizard;
 import kparserbenchmark.projectwizard.NewProjectWizard;
@@ -35,6 +36,7 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.eclipse.ui.internal.dialogs.WorkbenchWizardElement;
 import org.eclipse.ui.internal.wizards.AbstractExtensionWizardRegistry;
+import org.eclipse.ui.part.EditorInputTransfer;
 import org.eclipse.ui.wizards.IWizardCategory;
 import org.eclipse.ui.wizards.IWizardDescriptor;
 
@@ -74,6 +76,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowCoolBar(false);
 		configurer.setShowStatusLine(true);
 		configurer.setShowMenuBar(true);
+
+		/*configurer.addEditorAreaTransfer(EditorInputTransfer.getInstance());
+		configurer.configureEditorAreaDropListener(
+		new EditorAreaDropAdapter(configurer.getWindow()));*/
+
 	}
 
 	@Override

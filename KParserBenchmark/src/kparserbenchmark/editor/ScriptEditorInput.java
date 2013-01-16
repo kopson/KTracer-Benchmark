@@ -16,7 +16,7 @@
 
 package kparserbenchmark.editor;
 
-import kparserbenchmark.projectexplorer.Category;
+import kparserbenchmark.projectexplorer.ProjectLeaf;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -34,14 +34,14 @@ public class ScriptEditorInput implements IEditorInput {
 	/**
 	 * The name of currently selected file.
 	 */
-	private Category participant;
+	private ProjectLeaf participant;
 
 	/**
 	 * The constructor.
 	 * 
 	 * @param participant
 	 */
-	public ScriptEditorInput(Category participant) {
+	public ScriptEditorInput(ProjectLeaf participant) {
 		super();
 		Assert.isNotNull(participant);
 		this.participant = participant;
@@ -93,7 +93,7 @@ public class ScriptEditorInput implements IEditorInput {
 		return null;
 	}
 	
-	public Category getCategory() {
+	public ProjectLeaf getCategory() {
 		return participant;
 	}
 }

@@ -18,8 +18,8 @@ package kparserbenchmark.commands;
 
 import java.util.logging.Logger;
 
-import kparserbenchmark.projectexplorer.Project;
-import kparserbenchmark.projectexplorer.Project.Status;
+import kparserbenchmark.projectexplorer.ProjectNode;
+import kparserbenchmark.projectexplorer.ProjectNode.Status;
 import kparserbenchmark.projectexplorer.ProjectExplorer;
 import kparserbenchmark.utils.KWindow;
 
@@ -76,8 +76,8 @@ public class RefreshProjectAction extends Action implements ISelectionListener,
 		if (selection instanceof IStructuredSelection) {
 			this.selection = (IStructuredSelection) selection;
 			if (this.selection.size() == 1
-					&& this.selection.getFirstElement() instanceof Project) {
-				Project proj = (Project) this.selection.getFirstElement();
+					&& this.selection.getFirstElement() instanceof ProjectNode) {
+				ProjectNode proj = (ProjectNode) this.selection.getFirstElement();
 				if (proj.getCurrStatus() == Status.OPENED) {
 					setEnabled(true);
 					return;

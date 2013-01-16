@@ -21,34 +21,37 @@ import kparserbenchmark.utils.KFile;
 /**
  * Project's file representation in ProjectExplorer
  * 
- * @author kopson
+ * Review history:
+ * Rev 1: [15.01.2013] Kopson:
+ * 		TODO: Add synchronization with file-system mechanism.
+ * 		TODO: Add synchronization validation decoration to file icon.  
+ * 		TODO: Add copy/move/link/hard-remove/soft-remove operations
+ * 
+ * @author Kopson
  */
-public class Category {
-
-	// Project's file name
-	private String name;
-
-	// Project's file path
-	private String path;
-
-	// Project that this file belongs to
-	private Project parent;
+public class ProjectLeaf extends ProjectItem {
 
 	/**
 	 * The constructor
 	 * 
+	 * @param type
 	 * @param parent
-	 *            File's parent project
 	 * @param path
-	 *            File's path
 	 * @param name
-	 *            File's name
 	 */
-	public Category(Project parent, String path, String name) {
-		// Assert.isNotNull(parent);
-		this.parent = parent;
-		this.path = path;
-		this.name = name;
+	public ProjectLeaf(ItemTypes type, ProjectNode parent, String path, String name) {
+		super(type, parent, path, name);
+	}
+
+	/**
+	 * The constructor for files opened from file-system
+	 * 
+	 * @param parent
+	 * @param path
+	 * @param name
+	 */
+	public ProjectLeaf(ProjectNode parent, String path, String name) {
+		super(ItemTypes.RAW_FILE, parent, path, name);
 	}
 
 	/**
@@ -70,38 +73,19 @@ public class Category {
 		if (obj == null)
 			return false;
 
-		if (obj instanceof Category) {
-			if (this.parent != null && ((Category) obj).parent != null) {
-				if (((Category) obj).parent.equals(this.parent)) {
-					return ((Category) obj).name.equals(this.name);
+		if (obj instanceof ProjectLeaf) {
+			if (this.parent != null && ((ProjectLeaf) obj).parent != null) {
+				if (((ProjectLeaf) obj).parent.equals(this.parent)) {
+					return ((ProjectLeaf) obj).name.equals(this.name);
 				} else {
 					return false;
 				}
 			} else {
-				return ((Category) obj).path.equals(this.path);
+				return ((ProjectLeaf) obj).path.equals(this.path);
 			}
 		} else {
 			return false;
 		}
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	/**
-	 * Return parent's path
-	 * 
-	 * @return Returns parent's path
-	 */
-	public String getParentPath() {
-		if (parent != null)
-			return parent.getPath();
-		return null;
 	}
 
 	/**

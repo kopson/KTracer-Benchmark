@@ -16,7 +16,7 @@
 
 package kparserbenchmark.projectwizard;
 
-import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.ProjectNode;
 import kparserbenchmark.projectexplorer.ProjectExplorer;
 import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.KImage;
@@ -57,7 +57,7 @@ public class NewProjectWizard extends Wizard implements
 
 	@Override
 	public boolean performFinish() {
-		Project proj = new Project(one.getProjectName(), one.getProjectType(),
+		ProjectNode proj = new ProjectNode(one.getProjectName(), one.getProjectType(),
 				one.getProjectPath(), one.getProjectSummary(),
 				one.getProjectDescription());
 

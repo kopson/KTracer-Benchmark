@@ -18,7 +18,7 @@ package kparserbenchmark.editor;
 
 import java.io.File;
 
-import kparserbenchmark.projectexplorer.Category;
+import kparserbenchmark.projectexplorer.ProjectLeaf;
 import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.KFile;
 import kparserbenchmark.utils.KWindow;
@@ -57,7 +57,7 @@ public class ScriptEditor extends EditorPart {
 	private Text transcript;
 
 	// Editor input file
-	private Category inputFile;
+	private ProjectLeaf inputFile;
 
 	// Is file dirty
 	boolean dirty;
@@ -89,7 +89,7 @@ public class ScriptEditor extends EditorPart {
 		String file = KWindow.saveFileDialog(startingPath, inputFile.getName(),
 				KWindow.ALL);
 		if (file != null) {
-			inputFile = new Category(null, file, new File(file).getName());
+			inputFile = new ProjectLeaf(null, file, new File(file).getName());
 			setInputWithNotify(new ScriptEditorInput(inputFile));
 			setPartName(inputFile.getName());
 			firePropertyChange(IEditorPart.PROP_INPUT);

@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 import kparserbenchmark.application.Activator;
 import kparserbenchmark.editor.ScriptEditor;
 import kparserbenchmark.editor.ScriptEditorInput;
-import kparserbenchmark.projectexplorer.Category;
+import kparserbenchmark.projectexplorer.ProjectLeaf;
 import kparserbenchmark.utils.KImage;
 
 import org.eclipse.jface.action.Action;
@@ -93,7 +93,7 @@ public class ScriptEditorAction extends Action implements ISelectionListener,
 		if (incoming instanceof IStructuredSelection) {
 			selection = (IStructuredSelection) incoming;
 			setEnabled(selection.size() == 1
-				&& selection.getFirstElement() instanceof Category);
+				&& selection.getFirstElement() instanceof ProjectLeaf);
 		} else {
 			// Other selections, for example containing text or of other kinds.
 			setEnabled(false);
@@ -106,7 +106,7 @@ public class ScriptEditorAction extends Action implements ISelectionListener,
 	@Override
 	public void run() {
 		Object item = selection.getFirstElement();
-		Category entry = (Category) item;
+		ProjectLeaf entry = (ProjectLeaf) item;
 		IWorkbenchPage page = window.getActivePage();
 		ScriptEditorInput input = new ScriptEditorInput(entry);
 		try {

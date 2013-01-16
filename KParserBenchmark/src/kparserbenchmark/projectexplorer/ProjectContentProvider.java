@@ -29,9 +29,9 @@ public class ProjectContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof Project) {
-			Project project = (Project) parentElement;
-			return project.getElements().toArray();
+		if (parentElement instanceof ProjectNode) {
+			ProjectNode project = (ProjectNode) parentElement;
+			return project.getChildren();
 		}
 		return null;
 	}
@@ -43,7 +43,7 @@ public class ProjectContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof Project) {
+		if (element instanceof ProjectNode) {
 			return true;
 		}
 		return false;

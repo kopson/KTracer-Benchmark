@@ -18,8 +18,8 @@ package kparserbenchmark.commands;
 
 import java.io.File;
 
-import kparserbenchmark.projectexplorer.Category;
-import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.ProjectLeaf;
+import kparserbenchmark.projectexplorer.ProjectNode;
 import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.KWindow;
 
@@ -45,14 +45,14 @@ public class OpenFileHandler implements IHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		Project p = Workspace.getCurrProject();
+		ProjectNode p = Workspace.getCurrProject();
 		String file;
 		if(p != null)
 			file = KWindow.openFileDialog(p.getPath(), KWindow.ALL);
 		else
 			file = KWindow.openFileDialog(Workspace.getInstance().getPath(), KWindow.ALL);
 		if(file != null)
-			KWindow.openEditor(KWindow.getPage(), new Category(null, file,
+			KWindow.openEditor(KWindow.getPage(), new ProjectLeaf(null, file,
 				new File(file).getName()));
 		return null;
 	}

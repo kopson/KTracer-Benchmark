@@ -17,7 +17,6 @@
 package kparserbenchmark.projectexplorer;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,23 +32,17 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  * 
  * @author kopson
  */
-public final class Workspace {
+public final class Workspace extends ProjectItem {
 
 	// Logger instance
 	private final static Logger LOG = Logger.getLogger(Workspace.class
 			.getName());
 
-	// List of projects
-	private List<Project> projects;
-
-	// Workspace path
-	private String path;
-
 	// Implementation of Singleton Pattern
 	private static Workspace Instance;
 
 	// Current active project
-	private static Project currProject;
+	private static ProjectNode currProject;
 
 	// Default workspace name
 	public static final String KWorkspace = "kworkspace";
@@ -58,16 +51,25 @@ public final class Workspace {
 	private static final String invProj_err1 = "Invalid project(s) in workspace";
 
 	// Workspace keeps error value internally because if occurs errors during
-	// loading projects
-	// from workspace we cannot update status line - it is not created yet. We
-	// have to put off this until ProjectExplorer view will be created.
-	private int hasErrors;
+	// loading projects from workspace we cannot update status line - it is not
+	// created yet. We have to put off this until ProjectExplorer view will be
+	// created.
+	private ErrorTypes hasErrors;
 
+	/**
+	 * Error codes
+	 */
+	public static enum ErrorTypes {
+		NONE, // No error
+		INVALID_PROJECT, // Invalid project in workspace
+		INVALID_WORKSPACE // Error while initializing workspace
+	}
+	
 	/**
 	 * Private constructor
 	 */
 	private Workspace() {
-
+		super(ItemTypes.ROOT);
 		KWindow.getPrefs().addPropertyChangeListener(
 			new IPropertyChangeListener() {
 				@Override
@@ -100,7 +102,7 @@ public final class Workspace {
 		File f = new File(path);
 		if (!f.exists())
 			f.mkdir();
-		hasErrors = 0;
+		hasErrors = ErrorTypes.NONE;
 	}
 
 	/**
@@ -108,35 +110,41 @@ public final class Workspace {
 	 * 
 	 * @return
 	 */
-	public List<Project> setProjects() {
-		projects = new ArrayList<Project>();
-
+	public List<? super ProjectItem> setProjects() {
 		File f = new File(path);
 		if (f.isDirectory()) {
 			for (File c : f.listFiles()) {
 				if (c.isDirectory()) {
 					try {
-						Project project = new Project();
+						ProjectNode project = new ProjectNode();
 						project.init(c.getAbsolutePath());
-						if (project.getCurrStatus() == Project.Status.OPENED) {
+						if (project.getCurrStatus() == ProjectNode.Status.OPENED) {
 							for (File c1 : c.listFiles()) {
+								ItemTypes type = ItemTypes.UNKNOWN;
 								if (c1.isFile()) {
-									Category file = new Category(project,
-											c1.getAbsolutePath(), c1.getName());
-									project.getElements().add(file);
+									if(c1.getName().equals(properties))
+										type = ItemTypes.CONFIG_FILE;
+									else
+										type = ItemTypes.RAW_FILE;
+								} else if (c1.isDirectory()) {
+									type = ItemTypes.FOLDER;
+								} else {
+									assert(false); //TODO: Handle other types here
 								}
+								ProjectLeaf file = new ProjectLeaf(type, project,
+										c1.getAbsolutePath(), c1.getName());
+								project.addChild(file);
 							}
 						}
-						projects.add(project);
+						addChild(project);
 					} catch (ProjectException e) {
 						LOG.log(Level.WARNING, e.getMessage());
-						hasErrors = 1;
+						hasErrors = ErrorTypes.INVALID_PROJECT;
 					}
 				}
 			}
 		}
-
-		return projects;
+		return children;
 	}
 
 	/**
@@ -146,30 +154,20 @@ public final class Workspace {
 	 */
 	public String getError() {
 		switch (hasErrors) {
-		case 1:
+		case INVALID_PROJECT:
 			return invProj_err1;
 		default:
 			return null;
 		}
 	}
 
-	public List<Project> getProjects() {
-		return projects;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	public static Project getCurrProject() {
+	/********** Getters/Setters **********/
+	public static ProjectNode getCurrProject() {
 		return currProject;
 	}
 
-	public void setCurrProject(Project project) {
+	public void setCurrProject(ProjectNode project) {
 		currProject = project;
 	}
+	/*************************************/
 }

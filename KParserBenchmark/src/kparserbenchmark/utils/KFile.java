@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.ProjectNode;
 import kparserbenchmark.projectexplorer.Workspace;
 
 /**
@@ -72,7 +72,7 @@ public class KFile extends File {
 	 *            Property value
 	 * @return Returns true if property was written successfully
 	 */
-	public boolean writeProperty(Project.Properties property, String value) {
+	public boolean writeProperty(ProjectNode.Properties property, String value) {
 		try {
 			if (readProperty(property) == null) {
 				BufferedWriter out = new BufferedWriter(new FileWriter(this,
@@ -131,7 +131,7 @@ public class KFile extends File {
 	 *            Property name
 	 * @return Property value or NULL if not found
 	 */
-	public String readProperty(Project.Properties property) {
+	public String readProperty(ProjectNode.Properties property) {
 		InputStream fis;
 		BufferedReader in;
 		String line;

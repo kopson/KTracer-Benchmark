@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import kparserbenchmark.application.Activator;
 import kparserbenchmark.editor.ScriptEditor;
 import kparserbenchmark.editor.ScriptEditorInput;
-import kparserbenchmark.projectexplorer.Category;
+import kparserbenchmark.projectexplorer.ProjectLeaf;
 import kparserbenchmark.projectexplorer.Workspace;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -120,6 +120,28 @@ public class KWindow {
 	}
 
 	/**
+	 * Open editor
+	 * 
+	 * @param page
+	 *            Where to open editor
+	 * @param input
+	 *            Editor input
+	 * @param id
+	 *            Editor Id
+	 * @return Returns opened editor
+	 */
+	public static IEditorPart openEditor(IWorkbenchPage page,
+			ScriptEditorInput input, String id) {
+		try {
+			return page.openEditor(input, id);
+		} catch (PartInitException e) {
+			displayError(e.getMessage());
+			LOGe.log(Level.SEVERE, e.getMessage());
+		}
+		return null;
+	}
+
+	/**
 	 * Open script editor for file
 	 * 
 	 * @param page
@@ -128,18 +150,10 @@ public class KWindow {
 	 *            File input
 	 * @return Returns opened editor
 	 */
-	public static IEditorPart openEditor(IWorkbenchPage page,
-			Category participant) {
-		try {
-			return page.openEditor(new ScriptEditorInput(participant),
-					ScriptEditor.ID);
-		} catch (PartInitException e) {
-			displayError(e.getMessage());
-			LOGe.log(Level.SEVERE, e.getMessage());
-		}
-		return null;
+	public static IEditorPart openEditor(IWorkbenchPage page, ProjectLeaf participant) {
+		return openEditor(page, new ScriptEditorInput(participant), ScriptEditor.ID);
 	}
-
+	
 	/**
 	 * Get view by ID
 	 * 
@@ -175,12 +189,14 @@ public class KWindow {
 		MessageDialog.openError(PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow().getShell(), "Error", errorMsg);
 	}
-	
+
 	/**
 	 * Display question dialog
 	 * 
-	 * @param title Title
-	 * @param message Question message
+	 * @param title
+	 *            Title
+	 * @param message
+	 *            Question message
 	 * @return @see org.eclipse.jface.dialogs.MessageDialog.openQuestion()
 	 */
 	public static boolean openQuestionDialog(String title, String message) {

@@ -18,7 +18,7 @@ package kparserbenchmark.projectwizard;
 
 import java.io.File;
 
-import kparserbenchmark.projectexplorer.Project;
+import kparserbenchmark.projectexplorer.ProjectNode;
 import kparserbenchmark.projectexplorer.Workspace;
 import kparserbenchmark.utils.DuplicatedPathException;
 import kparserbenchmark.utils.FileBrowser;
@@ -137,7 +137,7 @@ public class NewProjectFilePage extends WizardPage {
 		subContainer.setLayout(subLayout);
 
 		filePath = new Text(subContainer, SWT.BORDER | SWT.SINGLE);
-		Project p = Workspace.getCurrProject();
+		ProjectNode p = Workspace.getCurrProject();
 		String basePath;
 		if (p == null)
 			basePath = Workspace.getInstance().getPath();
