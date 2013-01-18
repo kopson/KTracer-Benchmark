@@ -64,9 +64,9 @@ public class ProjectExplorer extends ViewPart {
 	private TreeViewer viewer;
 
 	private Clipboard clipboard;
-	
+
 	private GadgetTreeDropAdapter dropAdapter;
-	
+
 	/**
 	 * The constructor
 	 */
@@ -80,12 +80,12 @@ public class ProjectExplorer extends ViewPart {
 	 *            Viewer
 	 */
 	protected void initDragAndDrop(final StructuredViewer viewer) {
-		  int ops = DND.DROP_COPY | DND.DROP_MOVE;
-	      Transfer[] transfers = new Transfer[] { GadgetTransfer.getInstance()};
-	      viewer.addDragSupport(ops, transfers, new GadgetDragListener(viewer));
-	      transfers = new Transfer[] {GadgetTransfer.getInstance()};
-	      dropAdapter = new GadgetTreeDropAdapter((TreeViewer) viewer);
-	      viewer.addDropSupport(ops, transfers, dropAdapter);
+		int ops = DND.DROP_COPY | DND.DROP_MOVE;
+		Transfer[] transfers = new Transfer[] { GadgetTransfer.getInstance() };
+		viewer.addDragSupport(ops, transfers, new GadgetDragListener(viewer));
+		transfers = new Transfer[] { GadgetTransfer.getInstance() };
+		dropAdapter = new GadgetTreeDropAdapter((TreeViewer) viewer);
+		viewer.addDropSupport(ops, transfers, dropAdapter);
 	}
 
 	/**
@@ -179,7 +179,8 @@ public class ProjectExplorer extends ViewPart {
 					final IStructuredSelection selection = (IStructuredSelection) viewer
 							.getSelection();
 					if (selection.getFirstElement() instanceof ProjectNode) {
-						ProjectNode o = (ProjectNode) selection.getFirstElement();
+						ProjectNode o = (ProjectNode) selection
+								.getFirstElement();
 						o.checkDelete();
 						viewer.refresh(true);
 						KWindow.getStatusLine(ProjectExplorer.this).setMessage(
@@ -198,6 +199,21 @@ public class ProjectExplorer extends ViewPart {
 	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
+	}
+
+	/**
+	 * Return selected node
+	 * 
+	 * @return Returns selected node or null.
+	 */
+	public ProjectNode getSelectedNode() {
+		final IStructuredSelection selection = (IStructuredSelection) viewer
+				.getSelection();
+		Object o = selection.getFirstElement();
+		if (o instanceof ProjectNode) {
+			return (ProjectNode) selection.getFirstElement();
+		}
+		return null;
 	}
 
 	/**

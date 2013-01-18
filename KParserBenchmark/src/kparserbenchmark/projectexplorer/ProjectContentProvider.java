@@ -1,5 +1,8 @@
 package kparserbenchmark.projectexplorer;
 
+import kparserbenchmark.projectexplorer.ProjectItem.ItemTypes;
+import kparserbenchmark.projectexplorer.ProjectNode.Status;
+
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -10,7 +13,7 @@ import org.eclipse.jface.viewers.Viewer;
  */
 public class ProjectContentProvider implements ITreeContentProvider {
 
-	//Content's provider data - list of all workspace projects
+	// Content's provider data - list of all workspace projects
 	private Workspace model;
 
 	@Override
@@ -29,11 +32,7 @@ public class ProjectContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof ProjectNode) {
-			ProjectNode project = (ProjectNode) parentElement;
-			return project.getChildren();
-		}
-		return null;
+		return ((ProjectItem) parentElement).getChildren();
 	}
 
 	@Override
@@ -43,8 +42,12 @@ public class ProjectContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof ProjectNode) {
-			return true;
+		if (element instanceof ProjectNode
+				&& !(((ProjectNode) element).getCurrStatus() == Status.OPENED))
+			return false;
+		if (((ProjectItem) element).getType() == ItemTypes.FOLDER
+				|| ((ProjectItem) element).getType() == ItemTypes.NODE) {
+			return ((ProjectItem) element).getChildren() != null;
 		}
 		return false;
 	}

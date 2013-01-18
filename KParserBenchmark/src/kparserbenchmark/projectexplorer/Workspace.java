@@ -30,7 +30,12 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 /**
  * Project Explorer content model
  * 
- * @author kopson
+ * Review history:
+ * Rev 1: [18.01.2013] Kopson:
+ * 		TODO: Add reading workspace path from properties
+ * 		TODO: Display each error only once
+ * 
+ * @author Kopson
  */
 public final class Workspace extends ProjectItem {
 
@@ -47,8 +52,9 @@ public final class Workspace extends ProjectItem {
 	// Default workspace name
 	public static final String KWorkspace = "kworkspace";
 
-	// String constants
-	private static final String invProj_err1 = "Invalid project(s) in workspace";
+	// Error string constants
+	private static final String invProj_err1 	= "Invalid project(s) in workspace";
+	private static final String invWspace_err2 	= "Invalid workspace path";
 
 	// Workspace keeps error value internally because if occurs errors during
 	// loading projects from workspace we cannot update status line - it is not
@@ -64,7 +70,7 @@ public final class Workspace extends ProjectItem {
 		INVALID_PROJECT, // Invalid project in workspace
 		INVALID_WORKSPACE // Error while initializing workspace
 	}
-	
+
 	/**
 	 * Private constructor
 	 */
@@ -87,9 +93,8 @@ public final class Workspace extends ProjectItem {
 	 * @return
 	 */
 	public static synchronized Workspace getInstance() {
-		if (Instance == null) {
+		if (Instance == null)
 			Instance = new Workspace();
-		}
 		return Instance;
 	}
 
@@ -111,40 +116,61 @@ public final class Workspace extends ProjectItem {
 	 * @return
 	 */
 	public List<? super ProjectItem> setProjects() {
-		File f = new File(path);
-		if (f.isDirectory()) {
-			for (File c : f.listFiles()) {
-				if (c.isDirectory()) {
-					try {
-						ProjectNode project = new ProjectNode();
-						project.init(c.getAbsolutePath());
-						if (project.getCurrStatus() == ProjectNode.Status.OPENED) {
-							for (File c1 : c.listFiles()) {
-								ItemTypes type = ItemTypes.UNKNOWN;
-								if (c1.isFile()) {
-									if(c1.getName().equals(properties))
-										type = ItemTypes.CONFIG_FILE;
-									else
-										type = ItemTypes.RAW_FILE;
-								} else if (c1.isDirectory()) {
-									type = ItemTypes.FOLDER;
-								} else {
-									assert(false); //TODO: Handle other types here
-								}
-								ProjectLeaf file = new ProjectLeaf(type, project,
-										c1.getAbsolutePath(), c1.getName());
-								project.addChild(file);
-							}
-						}
-						addChild(project);
-					} catch (ProjectException e) {
-						LOG.log(Level.WARNING, e.getMessage());
-						hasErrors = ErrorTypes.INVALID_PROJECT;
+		children.clear();
+
+		File workspacePath = new File(path);
+		if (!workspacePath.isDirectory()) {
+			LOG.log(Level.SEVERE, "There is no walid workspace path!");
+			hasErrors = ErrorTypes.INVALID_WORKSPACE;
+			return null;
+		}
+		for (File projectFile : workspacePath.listFiles()) {
+			if (projectFile.isDirectory()) {
+				try {
+					ProjectNode project = new ProjectNode();
+					project.init(projectFile.getAbsolutePath());
+					if (project.getCurrStatus() == ProjectNode.Status.OPENED) {
+						listProjectFiles(projectFile, project);
 					}
+					addChild(project);
+				} catch (ProjectException e) {
+					LOG.log(Level.WARNING, e.getMessage());
+					hasErrors = ErrorTypes.INVALID_PROJECT;
 				}
 			}
 		}
 		return children;
+	}
+
+	/**
+	 * Add project files to project node
+	 * 
+	 * @param child
+	 *            project item
+	 * @param parent
+	 *            project node
+	 */
+	private void listProjectFiles(File child, ProjectItem parent) {
+		File dir = null;
+		for (File item : child.listFiles()) {
+			ItemTypes type = ItemTypes.UNKNOWN;
+			if (item.isFile()) {
+				if (item.getName().equals(properties) && parent instanceof ProjectNode)
+					type = ItemTypes.CONFIG_FILE;
+				else
+					type = ItemTypes.RAW_FILE;
+			} else if (item.isDirectory()) {
+				type = ItemTypes.FOLDER;
+				dir = item;
+			} else {
+				assert (false); // TODO: Handle other types here
+			}
+			ProjectLeaf fileItem = new ProjectLeaf(type, parent,
+					item.getAbsolutePath(), item.getName());
+			if(type == ItemTypes.FOLDER)
+				listProjectFiles(dir, fileItem);
+			parent.addChild(fileItem);
+		}
 	}
 
 	/**
@@ -156,6 +182,8 @@ public final class Workspace extends ProjectItem {
 		switch (hasErrors) {
 		case INVALID_PROJECT:
 			return invProj_err1;
+		case INVALID_WORKSPACE:
+			return invWspace_err2;
 		default:
 			return null;
 		}

@@ -141,7 +141,7 @@ public class NewProjectPage extends WizardPage {
 				KFile f = new KFile(projectPath.getText() + File.separator
 						+ string);
 				try {
-					if (f.isNameValid()) {
+					if (f.isNameValid(true)) {
 						txtDecorator.hide();
 						invalidData &= ~NAME_ERROR;
 					}

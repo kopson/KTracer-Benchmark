@@ -58,7 +58,7 @@ public abstract class ProjectItem {
 	// Item's file name
 	protected String name;
 
-	// Item's file path, contains item name
+	// Item's file path, doesn't contain item name
 	protected String path;
 
 	// Project that this file belongs to or Workspace that this project belongs
@@ -126,13 +126,13 @@ public abstract class ProjectItem {
 	}
 
 	/**
-	 * Return parent's path
+	 * Return parent's path with parent name
 	 * 
 	 * @return Returns parent's path
 	 */
 	public String getParentPath() {
 		if (parent != null)
-			return parent.getPath();
+			return parent.getPathName();
 		return null;
 	}
 
@@ -180,9 +180,34 @@ public abstract class ProjectItem {
 			LOG.log(Level.WARNING, "Removing null child");
 			return false;
 		}
+		if (hard) {
+			File f = new File(child.getPath());
+			f.delete();
+		}
 		return children.remove(child);
 	}
 
+	/**
+	 * Get children array
+	 * 
+	 * @return Returns children array or null
+	 */
+	public ProjectItem[] getChildren() {
+		if(children == null || children.size() == 0)
+			return null;
+		return (ProjectItem[]) children
+				.toArray(new ProjectItem[children.size()]);
+	}
+	
+	/**
+	 * Return full path
+	 * 
+	 * @return Returns full path to item
+	 */
+	public String getPathName() {
+		return path + File.separator + name;
+	}
+	
 	/********** Getters/Setters **********/
 	public ProjectItem getParent() {
 		return parent;
@@ -207,12 +232,6 @@ public abstract class ProjectItem {
 	public List<? super ProjectItem> getChildrenList() {
 		return children;
 	}
-
-	public ProjectItem[] getChildren() {
-		return (ProjectItem[]) children
-				.toArray(new ProjectItem[children.size()]);
-	}
-
 	/*************************************/
 
 	@Override

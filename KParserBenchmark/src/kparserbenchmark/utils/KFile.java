@@ -333,29 +333,38 @@ public class KFile extends File {
 	}
 
 	/**
-	 * Check if file name is valid name for file
+	 * Check if file/directory name is valid name for file/directory
 	 * 
+	 * @param isFile
+	 *            are we checking file or directory name
 	 * @return Returns true if name is valid or throws exception
 	 * 
 	 * @throws DuplicatedPathException
 	 * @throws InvalidPathException
 	 */
-	public boolean isNameValid() throws DuplicatedPathException, InvalidPathException {
-		Pattern pattern = Pattern.compile(".*\\W+.*");
+	public boolean isNameValid(boolean isFile) throws DuplicatedPathException,
+			InvalidPathException {
+		Pattern pattern = Pattern.compile("[^\\w+]");
 		String path = this.getAbsolutePath();
 		String name = this.getName();
+		boolean noExt = name.lastIndexOf('.') == name.length() - 1;
+		if(isFile)
+			name = name.replace(".", "");
+		else
+			noExt = false;
+		
 		Matcher matcher = pattern.matcher(name);
-		if (this.exists()) {
-			throw new DuplicatedPathException(path);
+		if (this.exists() && (this.isFile() && isFile || this.isDirectory() && !isFile)) {
+				throw new DuplicatedPathException(path);
 		} else {
-			if (matcher.find()) {
+			if (matcher.find() || noExt) {
 				throw new InvalidPathException(path);
 			} else {
 				return true;
 			}
 		}
 	}
-	
+
 	/**
 	 * Check if file name and path is valid name and path for file
 	 * 
@@ -364,8 +373,9 @@ public class KFile extends File {
 	 * @throws DuplicatedPathException
 	 * @throws InvalidPathException
 	 */
-	public boolean isPathNameValid() throws DuplicatedPathException, InvalidPathException {
-		boolean isValid = isNameValid();
+	public boolean isPathNameValid() throws DuplicatedPathException,
+			InvalidPathException {
+		boolean isValid = isNameValid(true);
 		if (!this.exists()) {
 			throw new InvalidPathException(this.getAbsolutePath());
 		} else {

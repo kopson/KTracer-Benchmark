@@ -8,6 +8,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.ui.ISharedImages;
 
 /**
  * Project explorer label provider
@@ -45,11 +46,35 @@ public class ProjectLabelProvider extends StyledCellLabelProvider {
 		} else {
 			ProjectLeaf category = (ProjectLeaf) element;
 			text.append(category.getName());
-			cell.setImage(KImage.getImageDescriptor(KImage.IMG_PROJECT_FILE)
-					.createImage());
-			if (category.getType() == ItemTypes.CONFIG_FILE)
+
+			switch (category.getType()) {
+			case CONFIG_FILE:
+				cell.setImage(KImage
+						.getImageDescriptor(KImage.IMG_PROJECT_FILE)
+						.createImage());
 				cell.setFont(JFaceResources.getFontRegistry().getItalic(
 						JFaceResources.DEFAULT_FONT));
+				break;
+			case RAW_FILE:
+				cell.setImage(KImage
+						.getImageDescriptor(KImage.IMG_PROJECT_FILE)
+						.createImage());
+				cell.setFont(JFaceResources.getFontRegistry().get(
+						JFaceResources.DEFAULT_FONT));
+				break;
+			case FOLDER:
+				cell.setImage(KImage
+						.getImageDescriptor(KImage.IMG_PROJECT_FOLDER)
+						.createImage());
+				cell.setFont(JFaceResources.getFontRegistry().get(
+						JFaceResources.DEFAULT_FONT));
+				break;
+			default:
+				cell.setImage(KImage.getSharedImage(ISharedImages.IMG_OBJ_FILE));
+				cell.setFont(JFaceResources.getFontRegistry().get(
+						JFaceResources.DEFAULT_FONT));
+				break;
+			}
 		}
 		cell.setText(text.toString());
 		cell.setStyleRanges(text.getStyleRanges());

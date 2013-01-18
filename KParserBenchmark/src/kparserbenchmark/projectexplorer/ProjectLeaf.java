@@ -39,7 +39,7 @@ public class ProjectLeaf extends ProjectItem {
 	 * @param path
 	 * @param name
 	 */
-	public ProjectLeaf(ItemTypes type, ProjectNode parent, String path, String name) {
+	public ProjectLeaf(ItemTypes type, ProjectItem parent, String path, String name) {
 		super(type, parent, path, name);
 	}
 
@@ -50,7 +50,7 @@ public class ProjectLeaf extends ProjectItem {
 	 * @param path
 	 * @param name
 	 */
-	public ProjectLeaf(ProjectNode parent, String path, String name) {
+	public ProjectLeaf(ProjectItem parent, String path, String name) {
 		super(ItemTypes.RAW_FILE, parent, path, name);
 	}
 
