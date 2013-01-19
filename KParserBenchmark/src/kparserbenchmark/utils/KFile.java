@@ -366,16 +366,17 @@ public class KFile extends File {
 	}
 
 	/**
-	 * Check if file name and path is valid name and path for file
+	 * Check if file/directory name and path is valid name and path for file/directory
 	 * 
+	 * @param isFile  are we checking file or directory name
 	 * @return Returns true if name and path is valid or throws exception
 	 * 
 	 * @throws DuplicatedPathException
 	 * @throws InvalidPathException
 	 */
-	public boolean isPathNameValid() throws DuplicatedPathException,
+	public boolean isPathNameValid(boolean isFile) throws DuplicatedPathException,
 			InvalidPathException {
-		boolean isValid = isNameValid(true);
+		boolean isValid = isNameValid(isFile);
 		if (!this.exists()) {
 			throw new InvalidPathException(this.getAbsolutePath());
 		} else {

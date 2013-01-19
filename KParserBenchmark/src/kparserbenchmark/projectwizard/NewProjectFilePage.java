@@ -48,7 +48,9 @@ import org.eclipse.ui.IViewPart;
 /**
  * Create new file wizard's page
  * 
- * Review history: Rev 1: [18.01.2013] Kopson: STATUS: Complete
+ * Review history: 
+ * Rev 1: [18.01.2013] Kopson: 
+ * 		STATUS: Complete
  * 
  * @author Kopson
  */
@@ -75,6 +77,7 @@ public class NewProjectFilePage extends WizardPage {
 
 	/** String constants */
 	private static final String fileNameValidator = "Please use only letters and digits";
+	private static final String filePathValidator = "Path does not exist";
 	private static final String fileNameDupVal = " with this name already exists";
 	private static final String description2 = "Set name";
 	private static final String description3 = "Set path";
@@ -149,8 +152,7 @@ public class NewProjectFilePage extends WizardPage {
 								Workspace.getInstance().getPath())) {
 					filePath.setText(selectedNode.getPath());
 					checkPath(pathDecor, nameDecor, filePath.getText());
-				} else if (selectedNode.isDirectory()
-						&& !isFileWizard) {
+				} else if (selectedNode.isDirectory() && !isFileWizard) {
 					fileName.setText(selectedNode.getName());
 					checkName(nameDecor, fileName.getText());
 				}
@@ -197,10 +199,12 @@ public class NewProjectFilePage extends WizardPage {
 	 * 
 	 * @param container
 	 *            Widget controller
-	 * @param nameDecorator name decorator
+	 * @param nameDecorator
+	 *            name decorator
 	 * @return Returns controller decoration
 	 */
-	private ControlDecoration createProjectPath(Composite container, final ControlDecoration nameDecorator) {
+	private ControlDecoration createProjectPath(Composite container,
+			final ControlDecoration nameDecorator) {
 		Label filePathLabel = new Label(container, SWT.NULL);
 		filePathLabel.setText("Path: ");
 
@@ -249,7 +253,8 @@ public class NewProjectFilePage extends WizardPage {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				checkPath(pathDecorator, nameDecorator, ((Text) e.getSource()).getText());
+				checkPath(pathDecorator, nameDecorator,
+						((Text) e.getSource()).getText());
 			}
 
 		});
@@ -277,7 +282,8 @@ public class NewProjectFilePage extends WizardPage {
 					invalidData &= ~NAME_ERROR;
 				}
 			} catch (DuplicatedPathException e1) {
-				txtDecorator.setDescriptionText((isFileWizard ? "File" : "Directory") + fileNameDupVal);
+				txtDecorator.setDescriptionText((isFileWizard ? "File"
+						: "Directory") + fileNameDupVal);
 				txtDecorator.show();
 				invalidData |= NAME_ERROR;
 			} catch (InvalidPathException e1) {
@@ -297,11 +303,12 @@ public class NewProjectFilePage extends WizardPage {
 	 * @param source
 	 *            String to check
 	 */
-	private void checkPath(ControlDecoration pathDecorator, ControlDecoration nameDecorator, String source) {
+	private void checkPath(ControlDecoration pathDecorator,
+			ControlDecoration nameDecorator, String source) {
 		if (source != null) {
 			KFile f = new KFile(source);
 			try {
-				if (f.isPathNameValid()) {
+				if (f.isPathNameValid(isFileWizard)) {
 					pathDecorator.hide();
 					invalidData &= ~PATH_ERROR; // Turn off error bit
 				}
@@ -309,7 +316,7 @@ public class NewProjectFilePage extends WizardPage {
 				pathDecorator.hide();
 				invalidData &= ~PATH_ERROR; // Turn off error bit
 			} catch (InvalidPathException e1) {
-				pathDecorator.setDescriptionText(fileNameValidator);
+				pathDecorator.setDescriptionText(filePathValidator);
 				pathDecorator.show();
 				invalidData |= PATH_ERROR; // Turn on error bit
 			}

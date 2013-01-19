@@ -30,16 +30,20 @@ import org.eclipse.ui.IWorkbench;
 /**
  * Creates new project wizard
  * 
- * @author kopson
+ * Review history: 
+ * Rev 1: [19.01.2013] Kopson: 
+ * 		STATUS: Complete
+ * 
+ * @author Kopson
  */
 public class NewProjectWizard extends Wizard implements
 		org.eclipse.ui.INewWizard {
 
-	// The command ID
+	/** The wizard ID */
 	public static final String ID = "KParserBenchmark.NewProjectWizard";
 
-	// Wizard pages
-	protected NewProjectPage one;
+	/** Wizard page */
+	protected NewProjectPage first;
 
 	/**
 	 * The constructor
@@ -51,15 +55,15 @@ public class NewProjectWizard extends Wizard implements
 
 	@Override
 	public void addPages() {
-		one = new NewProjectPage();
-		addPage(one);
+		first = new NewProjectPage();
+		addPage(first);
 	}
 
 	@Override
 	public boolean performFinish() {
-		ProjectNode proj = new ProjectNode(one.getProjectName(), one.getProjectType(),
-				one.getProjectPath(), one.getProjectSummary(),
-				one.getProjectDescription());
+		ProjectNode proj = new ProjectNode(first.getProjectName(),
+				first.getProjectType(), first.getProjectPath(),
+				first.getProjectSummary(), first.getProjectDescription());
 
 		if (proj == null || !proj.create())
 			KWindow.getStatusLine(KWindow.getView(ProjectExplorer.ID))

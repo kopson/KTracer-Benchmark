@@ -8,7 +8,6 @@ import kparserbenchmark.commands.OpenProjectAction;
 import kparserbenchmark.commands.PasteFileAction;
 import kparserbenchmark.commands.RefreshProjectAction;
 import kparserbenchmark.commands.ScriptEditorAction;
-import kparserbenchmark.editor.ScriptEditorInput;
 import kparserbenchmark.utils.KImage;
 import kparserbenchmark.utils.KWindow;
 
@@ -23,18 +22,10 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DragSourceAdapter;
-import org.eclipse.swt.dnd.DragSourceEvent;
-import org.eclipse.swt.dnd.DragSourceListener;
-import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
@@ -42,7 +33,6 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
-import org.eclipse.ui.part.EditorInputTransfer;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -124,7 +114,7 @@ public class ProjectExplorer extends ViewPart {
 				window);
 		final RefreshProjectAction refreshProjectAction = new RefreshProjectAction(
 				window);
-
+		
 		// Create new context menu for tree viewer
 		MenuManager menuManager = new MenuManager();
 		viewer.getControl().setMenu(
@@ -141,6 +131,7 @@ public class ProjectExplorer extends ViewPart {
 					if (selection.getFirstElement() instanceof ProjectNode) {
 						manager.add(openProjectAction);
 						manager.add(refreshProjectAction);
+						manager.add( new DeleteProjectAction());
 						manager.add(new Separator(
 								IWorkbenchActionConstants.MB_ADDITIONS));
 						manager.add(new SetProjectAction());
@@ -176,18 +167,7 @@ public class ProjectExplorer extends ViewPart {
 			@Override
 			public void keyReleased(final KeyEvent e) {
 				if (e.keyCode == SWT.DEL) {
-					final IStructuredSelection selection = (IStructuredSelection) viewer
-							.getSelection();
-					if (selection.getFirstElement() instanceof ProjectNode) {
-						ProjectNode o = (ProjectNode) selection
-								.getFirstElement();
-						o.checkDelete();
-						viewer.refresh(true);
-						KWindow.getStatusLine(ProjectExplorer.this).setMessage(
-								KImage.getImage(KImage.IMG_INFO_STATUS),
-								"Deleted project " + o.getName());
-					}
-
+					deleteProject();
 				}
 			}
 		});
@@ -201,6 +181,24 @@ public class ProjectExplorer extends ViewPart {
 		viewer.getControl().setFocus();
 	}
 
+	/**
+	 * 
+	 */
+	private void deleteProject() {
+		final IStructuredSelection selection = (IStructuredSelection) viewer
+				.getSelection();
+		if (selection.getFirstElement() instanceof ProjectNode) {
+			ProjectNode o = (ProjectNode) selection
+					.getFirstElement();
+			o.checkDelete();
+			viewer.refresh(true);
+			KWindow.getStatusLine(ProjectExplorer.this).setMessage(
+					KImage.getImage(KImage.IMG_INFO_STATUS),
+					"Deleted project " + o.getName());
+		}
+		
+	}
+	
 	/**
 	 * Return selected node
 	 * 
@@ -300,6 +298,28 @@ public class ProjectExplorer extends ViewPart {
 				Workspace.getInstance().setCurrProject(proj);
 				viewer.refresh(true);
 			}
+		}
+	}
+
+	/**
+	 * Delete project action
+	 */
+	private class DeleteProjectAction extends Action implements IWorkbenchAction {
+
+		public DeleteProjectAction() {
+			setText("Delete");
+			setToolTipText("Delete project");
+		}
+
+		@Override
+		public void dispose() {
+
+		}
+
+		@Override
+		public void run() {
+			super.run();
+			deleteProject();
 		}
 	}
 }

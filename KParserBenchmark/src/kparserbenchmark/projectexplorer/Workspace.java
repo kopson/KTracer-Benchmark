@@ -128,7 +128,11 @@ public final class Workspace extends ProjectItem {
 			if (projectFile.isDirectory()) {
 				try {
 					ProjectNode project = new ProjectNode();
-					project.init(projectFile.getAbsolutePath());
+					if(!project.init(projectFile.getAbsolutePath())) {
+						LOG.log(Level.WARNING, project.getName() + ": No valid properties file found");
+						hasErrors = ErrorTypes.INVALID_PROJECT;
+						continue;
+					}
 					if (project.getCurrStatus() == ProjectNode.Status.OPENED) {
 						listProjectFiles(projectFile, project);
 					}
