@@ -45,6 +45,7 @@ public class KImage {
 	public static final String IMG_PROJECT_OPENED = "/icons/open_24.png";
 	public static final String IMG_PROJECT_CLOSED = "/icons/box_24.png";
 	public static final String IMG_PROJECT_FILE = "/icons/document_24.png";
+	public static final String IMG_TABLE_FILE = "/icons/table_24.png";
 	public static final String IMG_PROJECT_FOLDER = "/icons/folder_24.png";
 	public static final String IMG_SCRIPT_EDITOR = "icons/pencil_16.png";
 	public static final String IMG_LOG_CONSOLE = "/icons/terminal_16.png";

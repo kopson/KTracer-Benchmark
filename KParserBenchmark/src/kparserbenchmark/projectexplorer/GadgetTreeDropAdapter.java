@@ -50,8 +50,6 @@ public class GadgetTreeDropAdapter extends ViewerDropAdapter {
 		else
 			assert (false);
 
-		System.out.println("performDrop to " + parent.getName());
-
 		ProjectLeaf[] toDrop = (ProjectLeaf[]) data;
 		TreeViewer viewer = (TreeViewer) getViewer();
 		// cannot drop a gadget onto itself or a child
@@ -62,7 +60,6 @@ public class GadgetTreeDropAdapter extends ViewerDropAdapter {
 			toDrop[i].setParent(parent);
 			parent.addChild(toDrop[i]);
 			//viewer.add(target, toDrop[i]);
-			System.out.println("add " + toDrop[i].getName() + " to " + parent.getName());
 			//viewer.reveal(toDrop[i]);
 			//viewer.refresh();
 		}

@@ -16,14 +16,18 @@
 
 package kparserbenchmark.projectexplorer;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import static java.nio.file.StandardCopyOption.*;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import kparserbenchmark.editor.ScriptEditor;
+import kparserbenchmark.editor.ScriptEditorInput;
 import kparserbenchmark.projectexplorer.ProjectItem.ItemTypes;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -31,6 +35,7 @@ import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceAdapter;
 import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.ui.part.EditorInputTransfer;
 
 /**
  * Supports dragging gadgets from a structured viewer.
@@ -39,8 +44,15 @@ import org.eclipse.swt.dnd.DragSourceEvent;
  */
 public class GadgetDragListener extends DragSourceAdapter {
 
-	// Tree viewer
+	/** Logger instance */
+	private static final Logger LOG = Logger.getLogger(GadgetDragListener.class
+			.getName());
+
+	/** Tree viewer */
 	private StructuredViewer viewer;
+
+	/** Workaround for DND support in eclipse */
+	public static Object globalEventData;
 
 	/**
 	 * The constructor
@@ -53,35 +65,46 @@ public class GadgetDragListener extends DragSourceAdapter {
 
 	/**
 	 * Remove selected items from source tree branch
+	 * 
+	 * @param event
+	 *            drag event
 	 */
 	@SuppressWarnings("rawtypes")
 	@Override
 	public void dragFinished(DragSourceEvent event) {
-		System.out.println("dragFinished");
 		if (!event.doit)
 			return;
+		/*
+		 * if (event.data instanceof EditorInputTransfer.EditorInputData) {
+		 * return; }
+		 */
+
 		// if the gadget was moved, remove it from the source viewer
 		if (event.detail == DND.DROP_MOVE) {
-			System.out.println("DROP_MOVE");
 			IStructuredSelection selection = (IStructuredSelection) viewer
 					.getSelection();
 			for (Iterator it = selection.iterator(); it.hasNext();) {
 				ProjectLeaf child = (ProjectLeaf) it.next();
-				System.out.println("Remove " + child.getPath());
-				ProjectNode parent = (ProjectNode) (child.getParent());
-				System.out.println("Paste " +parent.getPath() + File.separator + child.getName());
+				ProjectNode parent = null;
+				if(child.getParent() instanceof ProjectNode) {
+					parent = (ProjectNode) (child.getParent());
+				} else {
+					LOG.log(Level.SEVERE, "Can'f find item's parent node");
+					return;
+				}
 				try {
-					Files.move(Paths.get(child.getPath()), Paths.get(parent.getPath() + File.separator + child.getName()),
-							REPLACE_EXISTING);
+					Files.move(
+							Paths.get(child.getPath()),
+							Paths.get(parent.getPath() + File.separator
+									+ child.getName()), REPLACE_EXISTING);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					LOG.log(Level.SEVERE, e.getMessage());
 				}
 				parent.removeChild(child, false);
 			}
 			viewer.refresh();
 		} else {
-			System.out.println(" NOT DROP_MOVE");
+			// TODO: Add DROP_COPY handling here
 		}
 	}
 
@@ -93,12 +116,31 @@ public class GadgetDragListener extends DragSourceAdapter {
 	public void dragSetData(DragSourceEvent event) {
 		IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
-
 		ProjectLeaf[] dragItems = (ProjectLeaf[]) selection.toList().toArray(
 				new ProjectLeaf[selection.size()]);
+		
 		if (GadgetTransfer.getInstance().isSupportedType(event.dataType)) {
 			event.data = dragItems;
+			return;
 		}
+
+		if (EditorInputTransfer.getInstance().isSupportedType(event.dataType)) {
+			EditorInputTransfer.EditorInputData[] inputs = new EditorInputTransfer.EditorInputData[dragItems.length];
+			EditorInputTransfer.EditorInputData data;
+			for (int i = 0; i < dragItems.length; i++) {
+				data = EditorInputTransfer.createEditorInputData(
+						ScriptEditor.ID, new ScriptEditorInput(dragItems[i]));
+				if (data != null) {
+					inputs[i] = data;
+				}
+			}
+			event.data = inputs;
+			// We create static container for event data because we permanently
+			// got null reading event.data in drop() method
+			globalEventData = inputs;
+			return;
+		}
+		event.doit = false;
 	}
 
 	/**

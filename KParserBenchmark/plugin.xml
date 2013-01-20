@@ -78,8 +78,16 @@
             class="kparserbenchmark.editor.ScriptEditor"
             default="false"
             icon="icons/document_pencil_16.png"
-            id="KParserBenchmark.editor.mainEditor"
+            id="KParserBenchmark.editor.ScriptEditor"
             name="Script Editor">
+      </editor>
+      <editor
+            class="kparserbenchmark.projects.test.TableEditor"
+            default="false"
+            extensions="tbl"
+            icon="icons/table_24.png"
+            id="KParserBenchmark.projects.test.TableEditor"
+            name="Table Editor">
       </editor>
    </extension>
    <extension
@@ -303,6 +311,13 @@
             schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
             sequence="M1+Q">
       </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="kparserbenchmark.editor.ScriptEditorInputFactory"
+            id="KParserBenchmark.editor.ScriptEditorInputFactory">
+      </factory>
    </extension>
 
 </plugin>

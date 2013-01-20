@@ -28,6 +28,7 @@ import org.eclipse.ui.IWorkbench;
 
 /**
  * Creates new directory wizard
+ * 
  * Review history: 
  * Rev 1: [18.01.2013] Kopson:
  * 		STATUS: Complete

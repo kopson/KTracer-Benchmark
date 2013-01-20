@@ -41,6 +41,10 @@ import org.eclipse.ui.part.EditorPart;
 /**
  * Script editor class.
  * 
+ * Review history: 
+ * Rev 1: [19.01.2013] Kopson: 
+ * 		TODO: Fix saving action invoked by CTRL+S
+ * 
  * @author kopson
  * 
  */
@@ -49,17 +53,17 @@ public class ScriptEditor extends EditorPart {
 	/**
 	 * Script editor ID.
 	 */
-	public static String ID = "KParserBenchmark.editor.mainEditor";
+	public static String ID = "KParserBenchmark.editor.ScriptEditor";
 
 	/**
 	 * Editor body.
 	 */
 	private Text transcript;
 
-	// Editor input file
+	/** Editor input file */
 	private ProjectLeaf inputFile;
 
-	// Is file dirty
+	/** Is file dirty */
 	boolean dirty;
 
 	/**
@@ -105,7 +109,7 @@ public class ScriptEditor extends EditorPart {
 		setInput(input);
 		setPartName(getScriptEditorName());
 		dirty = false;
-		inputFile = ((ScriptEditorInput) input).getCategory();
+		inputFile = ((ScriptEditorInput) input).getItem();
 	}
 
 	@Override
@@ -172,7 +176,18 @@ public class ScriptEditor extends EditorPart {
 	 * Marks this file for save method
 	 */
 	private void setDirty() {
-		dirty = true;
-		firePropertyChange(ISaveablePart.PROP_DIRTY);
+		if(transcript.getEditable()) {
+			dirty = true;
+			firePropertyChange(ISaveablePart.PROP_DIRTY);
+		}
+	}
+	
+	/**
+	 * Set editor editable
+	 * 
+	 * @param editable
+	 */
+	public void setEditable(boolean editable) {
+		transcript.setEditable(editable);
 	}
 }

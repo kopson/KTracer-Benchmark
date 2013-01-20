@@ -123,10 +123,8 @@ public class GadgetTransfer extends ByteArrayTransfer {
 		String type = dataIn.readUTF();
 		int n = dataIn.readInt();
 		ProjectLeaf newGadget = new ProjectLeaf(ProjectItem.ItemTypes.valueOf(type), null, path, name);
-		System.out.println("readGadget " + newGadget.getName());
 		for (int i = 0; i < n; i++) {
 			ProjectLeaf child = readGadget(dataIn);
-			System.out.println("readGadget " + child.getName());
 			
 			if(newGadget != null) {
 				newGadget.addChild(child);
@@ -182,7 +180,6 @@ public class GadgetTransfer extends ByteArrayTransfer {
 	private void writeGadget(ProjectLeaf gadget, DataOutputStream dataOut)
 			throws IOException {
 		
-		System.out.println("writeGadget " + gadget.getName());
 		dataOut.writeUTF(gadget.getName());
 		dataOut.writeUTF(gadget.getPath());
 		dataOut.writeUTF(gadget.type.name());
@@ -190,12 +187,10 @@ public class GadgetTransfer extends ByteArrayTransfer {
 		ProjectLeaf[] children = (ProjectLeaf[]) gadget.getChildren();
 		if (children == null) {
 			dataOut.writeInt(0);
-			System.out.println("no children");
 		} else {
 			dataOut.writeInt(children.length);
 			for (int i = 0; i < children.length; i++) {
 				writeGadget(children[i], dataOut);
-				System.out.println("children " + children[i].getName());
 			}
 		}
 	}

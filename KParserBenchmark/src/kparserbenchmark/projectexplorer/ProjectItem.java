@@ -44,7 +44,8 @@ public abstract class ProjectItem {
 	 */
 	public static enum ItemTypes {
 		UNKNOWN, // Unknown item type
-		RAW_FILE, // File Item
+		RAW_FILE, // Raw data file Item
+		TBL_FILE, // Table data file item
 		FOLDER, // Folder item
 		NODE, // Project folder
 		ROOT, // Workspace folder

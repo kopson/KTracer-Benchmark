@@ -33,6 +33,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.eclipse.ui.part.EditorInputTransfer;
 import org.eclipse.ui.part.ViewPart;
 
 /**
@@ -70,8 +71,9 @@ public class ProjectExplorer extends ViewPart {
 	 *            Viewer
 	 */
 	protected void initDragAndDrop(final StructuredViewer viewer) {
-		int ops = DND.DROP_COPY | DND.DROP_MOVE;
-		Transfer[] transfers = new Transfer[] { GadgetTransfer.getInstance() };
+		int ops = DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_DEFAULT;
+		Transfer[] transfers = new Transfer[] {
+				EditorInputTransfer.getInstance(), GadgetTransfer.getInstance() };
 		viewer.addDragSupport(ops, transfers, new GadgetDragListener(viewer));
 		transfers = new Transfer[] { GadgetTransfer.getInstance() };
 		dropAdapter = new GadgetTreeDropAdapter((TreeViewer) viewer);
@@ -114,7 +116,7 @@ public class ProjectExplorer extends ViewPart {
 				window);
 		final RefreshProjectAction refreshProjectAction = new RefreshProjectAction(
 				window);
-		
+
 		// Create new context menu for tree viewer
 		MenuManager menuManager = new MenuManager();
 		viewer.getControl().setMenu(
@@ -131,7 +133,7 @@ public class ProjectExplorer extends ViewPart {
 					if (selection.getFirstElement() instanceof ProjectNode) {
 						manager.add(openProjectAction);
 						manager.add(refreshProjectAction);
-						manager.add( new DeleteProjectAction());
+						manager.add(new DeleteProjectAction());
 						manager.add(new Separator(
 								IWorkbenchActionConstants.MB_ADDITIONS));
 						manager.add(new SetProjectAction());
@@ -188,17 +190,16 @@ public class ProjectExplorer extends ViewPart {
 		final IStructuredSelection selection = (IStructuredSelection) viewer
 				.getSelection();
 		if (selection.getFirstElement() instanceof ProjectNode) {
-			ProjectNode o = (ProjectNode) selection
-					.getFirstElement();
+			ProjectNode o = (ProjectNode) selection.getFirstElement();
 			o.checkDelete();
 			viewer.refresh(true);
 			KWindow.getStatusLine(ProjectExplorer.this).setMessage(
 					KImage.getImage(KImage.IMG_INFO_STATUS),
 					"Deleted project " + o.getName());
 		}
-		
+
 	}
-	
+
 	/**
 	 * Return selected node
 	 * 
@@ -304,7 +305,8 @@ public class ProjectExplorer extends ViewPart {
 	/**
 	 * Delete project action
 	 */
-	private class DeleteProjectAction extends Action implements IWorkbenchAction {
+	private class DeleteProjectAction extends Action implements
+			IWorkbenchAction {
 
 		public DeleteProjectAction() {
 			setText("Delete");

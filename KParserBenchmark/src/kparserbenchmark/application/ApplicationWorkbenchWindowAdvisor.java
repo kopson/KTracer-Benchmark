@@ -77,9 +77,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowStatusLine(true);
 		configurer.setShowMenuBar(true);
 
-		/*configurer.addEditorAreaTransfer(EditorInputTransfer.getInstance());
+		configurer.addEditorAreaTransfer(EditorInputTransfer.getInstance());
 		configurer.configureEditorAreaDropListener(
-		new EditorAreaDropAdapter(configurer.getWindow()));*/
+		new EditorAreaDropAdapter(configurer.getWindow()));
 
 	}
 

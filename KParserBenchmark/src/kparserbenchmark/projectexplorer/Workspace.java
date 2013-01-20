@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 
 import kparserbenchmark.utils.KWindow;
 
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -39,6 +40,8 @@ import org.eclipse.jface.util.PropertyChangeEvent;
  */
 public final class Workspace extends ProjectItem {
 
+	public static final String tblExt = "tbl";
+	
 	// Logger instance
 	private final static Logger LOG = Logger.getLogger(Workspace.class
 			.getName());
@@ -161,6 +164,8 @@ public final class Workspace extends ProjectItem {
 			if (item.isFile()) {
 				if (item.getName().equals(properties) && parent instanceof ProjectNode)
 					type = ItemTypes.CONFIG_FILE;
+				else if (FilenameUtils.getExtension(item.getName()).equals(tblExt))
+					type = ItemTypes.TBL_FILE;
 				else
 					type = ItemTypes.RAW_FILE;
 			} else if (item.isDirectory()) {

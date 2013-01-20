@@ -28,15 +28,15 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 
 /**
- * Creates new project file wizard
+ * Creates new project file wizard 
+ * 
  * Review history: 
  * Rev 1: [18.01.2013] Kopson:
  * 		STATUS: Complete
  * 
  * @author kopson
  */
-public class NewFileWizard extends Wizard implements
-		org.eclipse.ui.INewWizard {
+public class NewFileWizard extends Wizard implements org.eclipse.ui.INewWizard {
 
 	/** The wizard ID */
 	public static final String ID = "KParserBenchmark.NewFileWizard";

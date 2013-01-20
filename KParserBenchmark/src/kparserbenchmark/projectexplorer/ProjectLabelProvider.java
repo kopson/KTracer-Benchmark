@@ -1,6 +1,5 @@
 package kparserbenchmark.projectexplorer;
 
-import kparserbenchmark.projectexplorer.ProjectItem.ItemTypes;
 import kparserbenchmark.projectexplorer.ProjectNode.Status;
 import kparserbenchmark.utils.KImage;
 
@@ -58,6 +57,13 @@ public class ProjectLabelProvider extends StyledCellLabelProvider {
 			case RAW_FILE:
 				cell.setImage(KImage
 						.getImageDescriptor(KImage.IMG_PROJECT_FILE)
+						.createImage());
+				cell.setFont(JFaceResources.getFontRegistry().get(
+						JFaceResources.DEFAULT_FONT));
+				break;
+			case TBL_FILE:
+				cell.setImage(KImage
+						.getImageDescriptor(KImage.IMG_TABLE_FILE)
 						.createImage());
 				cell.setFont(JFaceResources.getFontRegistry().get(
 						JFaceResources.DEFAULT_FONT));

@@ -21,18 +21,25 @@ import kparserbenchmark.projectexplorer.ProjectLeaf;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 
 /**
  * Describes script editor input.
  * 
- * @author kopson
- *
+ * Review history: 
+ * Rev 1: [19.01.2013] Kopson: 
+ * 		TODO: Add persistable handling
+ * 
+ * @author Kopson
+ * 
  */
-public class ScriptEditorInput implements IEditorInput {
+public class ScriptEditorInput implements IEditorInput, IPersistableElement {
+
+	public static final String KEY_NAME = "PersistedItem";
 	
 	/**
-	 * The name of currently selected file.
+	 * The name of currently selected item.
 	 */
 	private ProjectLeaf participant;
 
@@ -40,6 +47,7 @@ public class ScriptEditorInput implements IEditorInput {
 	 * The constructor.
 	 * 
 	 * @param participant
+	 *            selected item
 	 */
 	public ScriptEditorInput(ProjectLeaf participant) {
 		super();
@@ -64,7 +72,7 @@ public class ScriptEditorInput implements IEditorInput {
 
 	@Override
 	public IPersistableElement getPersistable() {
-		return null;
+		return this;
 	}
 
 	@Override
@@ -92,8 +100,21 @@ public class ScriptEditorInput implements IEditorInput {
 	public Object getAdapter(Class adapter) {
 		return null;
 	}
-	
-	public ProjectLeaf getCategory() {
+
+	/********** Getters/Setters **********/
+	public ProjectLeaf getItem() {
 		return participant;
+	}
+	/*************************************/
+
+	@Override
+	public void saveState(IMemento memento) {
+		memento.putString(KEY_NAME, this.participant.getName());
+		
+	}
+
+	@Override
+	public String getFactoryId() {
+		return ScriptEditorInputFactory.ID;
 	}
 }
