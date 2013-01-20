@@ -16,37 +16,42 @@
 
 package kparserbenchmark.projects.test;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 
 /**
- * Record provider creates data model for table view
+ * Record filter implementation
  * 
  * @author Kopson
  */
-public enum RecordProvider {
-	INSTANCE;
+public class RecordFilter extends ViewerFilter {
 
-	/** List of records */
-	private List<Record> records;
+	/** Searched string */
+	private String searchString;
 
 	/**
-	 * The constructor
+	 * Create search expression
+	 * 
+	 * @param s
+	 *            search string
 	 */
-	private RecordProvider() {
-		records = new ArrayList<Record>();
-
-		// TODO: Add database bindings here
-		records.add(new Record(1, "Log test 1", "TEST_1", (long) 98761234));
-		records.add(new Record(2, "Log test 2", "TEST_2", (long) 98761244));
-		records.add(new Record(3, "Log test 3", "TEST_3", (long) 98761534));
-		records.add(new Record(4, "Log test 4", "TEST_4", (long) 98761734));
-		records.add(new Record(5, "Log test 5", "TEST_5", (long) 98768234));
+	public void setSearchText(String s) {
+		// Search must be a substring of the existing value
+		this.searchString = ".*" + s + ".*";
 	}
 
-	/********** Getters/Setters **********/
-	public List<Record> getRecords() {
-		return records;
+	@Override
+	public boolean select(Viewer viewer, Object parentElement, Object element) {
+		if (searchString == null || searchString.length() == 0) {
+			return true;
+		}
+		Record rec = (Record) element;
+		if (rec.getLogName().matches(searchString)) {
+			return true;
+		}
+		if (rec.getLogType().matches(searchString)) {
+			return true;
+		}
+		return false;
 	}
-	/*************************************/
 }

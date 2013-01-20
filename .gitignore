@@ -2,6 +2,7 @@
 *.d
 *.~
 *.class
+*.*~
 
 # Package Files #
 *.jar
@@ -15,3 +16,6 @@ Debug/
 .kdatabase.properties
 
 *.sqlite
+
+*.log
+
