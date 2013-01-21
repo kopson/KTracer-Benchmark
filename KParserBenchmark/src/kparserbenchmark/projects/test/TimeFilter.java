@@ -48,7 +48,7 @@ public class TimeFilter extends ViewerFilter {
 			if (start < 0)
 				start = 0;
 		} catch (NumberFormatException e) {
-
+			start = 0;
 		}
 	}
 
@@ -62,7 +62,7 @@ public class TimeFilter extends ViewerFilter {
 			if (end < 0)
 				end = 0;
 		} catch (NumberFormatException e) {
-
+			end = 0;
 		}
 	}
 

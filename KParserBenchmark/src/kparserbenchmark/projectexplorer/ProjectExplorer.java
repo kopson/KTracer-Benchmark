@@ -2,6 +2,7 @@ package kparserbenchmark.projectexplorer;
 
 import java.util.logging.Logger;
 
+import kparserbenchmark.application.ApplicationActionBarAdvisor;
 import kparserbenchmark.commands.CopyFileAction;
 import kparserbenchmark.commands.CutFileAction;
 import kparserbenchmark.commands.OpenProjectAction;
@@ -30,8 +31,10 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.part.EditorInputTransfer;
 import org.eclipse.ui.part.ViewPart;
@@ -62,6 +65,9 @@ public class ProjectExplorer extends ViewPart {
 	 * The constructor
 	 */
 	public ProjectExplorer() {
+		ISelectionService ss = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow().getSelectionService();
+		ss.addSelectionListener(ApplicationActionBarAdvisor.copyAction);
 	}
 
 	/**

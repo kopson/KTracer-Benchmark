@@ -16,15 +16,30 @@
 
 package kparserbenchmark.projects.test;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import kparserbenchmark.editor.ScriptEditorInput;
 import kparserbenchmark.projectexplorer.ProjectLeaf;
+import kparserbenchmark.utils.KImage;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -34,13 +49,22 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.EditorPart;
 
 /**
@@ -65,6 +89,10 @@ public class TableEditor extends EditorPart {
 	/** Editor body */
 	private TableViewer viewer;
 
+	private Text startTimeText;
+	private Text endTimeText;
+	private boolean noVerify;
+
 	/** Editor input file */
 	@SuppressWarnings("unused")
 	private ProjectLeaf inputFile;
@@ -87,6 +115,7 @@ public class TableEditor extends EditorPart {
 		setPartName(getScriptEditorName());
 		inputFile = ((ScriptEditorInput) input).getItem();
 		comparator = new TableViewerComparator();
+		noVerify = false;
 	}
 
 	@Override
@@ -115,7 +144,7 @@ public class TableEditor extends EditorPart {
 	 */
 	private void createMenu(Composite parent) {
 		Composite container = new Composite(parent, SWT.BORDER);
-		GridLayout layout = new GridLayout(6, false);
+		GridLayout layout = new GridLayout(8, false);
 		container.setLayout(layout);
 		GridData gridData = new GridData(SWT.FILL, SWT.NONE, true, false);
 		gridData.horizontalSpan = 2;
@@ -137,16 +166,17 @@ public class TableEditor extends EditorPart {
 		Label startTimeLabel = new Label(container, SWT.NONE);
 		startTimeLabel.setText("Time from: ");
 
-		final Text startTimeText = new Text(container, SWT.BORDER | SWT.SEARCH);
+		startTimeText = new Text(container, SWT.BORDER | SWT.SEARCH);
 		startTimeText
-				.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+				.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
 		startTimeText.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent ke) {
-				timeFilter.setStartTime(startTimeText.getText());
+				timeFilter.setStartTime((startTimeText.getText() == "" || endTimeText
+						.getText() == null) ? "0" : startTimeText.getText());
 				viewer.refresh();
 			}
 		});
-		startTimeText.setText("0");
+		// startTimeText.setText("0");
 		startTimeText.addVerifyListener(new VerifyListener() {
 
 			@Override
@@ -158,14 +188,18 @@ public class TableEditor extends EditorPart {
 					event.doit = true;
 					return;
 				}
-				if (startTimeText.getText().length() == 1
+				/*if (startTimeText.getText().length() == 1
 						&& startTimeText.getText().charAt(0) == '0') {
 					event.doit = false;
 					return;
-				}
-				if (!('0' <= event.character && event.character <= '9')) {
-					event.doit = false;
-					return;
+				}*/
+				if (!noVerify) {
+					if (!('0' <= event.character && event.character <= '9')) {
+						event.doit = false;
+						return;
+					}
+				} else {
+					noVerify = false;
 				}
 			}
 		});
@@ -173,15 +207,17 @@ public class TableEditor extends EditorPart {
 		Label endTimeLabel = new Label(container, SWT.NONE);
 		endTimeLabel.setText("Time to: ");
 
-		final Text endTimeText = new Text(container, SWT.BORDER | SWT.SEARCH);
-		endTimeText.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+		endTimeText = new Text(container, SWT.BORDER | SWT.SEARCH);
+		endTimeText.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
 		endTimeText.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent ke) {
-				timeFilter.setEndTime(endTimeText.getText());
+				timeFilter.setEndTime((endTimeText.getText() == "" || endTimeText
+						.getText() == null) ? Long.toString(Long.MAX_VALUE)
+						: endTimeText.getText());
 				viewer.refresh();
 			}
 		});
-		endTimeText.setText("0");
+		// endTimeText.setText("0");
 		endTimeText.addVerifyListener(new VerifyListener() {
 
 			@Override
@@ -193,14 +229,18 @@ public class TableEditor extends EditorPart {
 					event.doit = true;
 					return;
 				}
-				if (endTimeText.getText().length() == 1
+				/*if (endTimeText.getText().length() == 1
 						&& endTimeText.getText().charAt(0) == '0') {
 					event.doit = false;
 					return;
-				}
-				if (!('0' <= event.character && event.character <= '9')) {
-					event.doit = false;
-					return;
+				}*/
+				if (!noVerify) {
+					if (!('0' <= event.character && event.character <= '9')) {
+						event.doit = false;
+						return;
+					}
+				} else {
+					noVerify = false;
 				}
 			}
 		});
@@ -244,6 +284,48 @@ public class TableEditor extends EditorPart {
 		gridData.grabExcessVerticalSpace = true;
 		gridData.horizontalAlignment = GridData.FILL;
 		viewer.getControl().setLayoutData(gridData);
+		viewer.addDoubleClickListener(new IDoubleClickListener() {
+			boolean toggleTime = false;
+
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				Object selection = event.getSelection();
+				if (selection instanceof StructuredSelection) {
+					Record rec = (Record) ((StructuredSelection) selection)
+							.getFirstElement();
+					noVerify = true;
+					if (toggleTime) {
+						endTimeText.setText(Long.toString(rec.getTimestamp()));
+						timeFilter.setEndTime(endTimeText.getText());
+					} else {
+						startTimeText.setText(Long.toString(rec.getTimestamp()));
+						timeFilter.setStartTime(startTimeText.getText());
+					}
+					toggleTime = !toggleTime;
+					viewer.refresh();
+				}
+			}
+		});
+	}
+
+	// The createMenuItem method add per column a
+	// new MenuItem to the menu
+	private void createMenuItem(Menu parent, final TableColumn column) {
+		final MenuItem itemName = new MenuItem(parent, SWT.CHECK);
+		itemName.setText(column.getText());
+		itemName.setSelection(column.getResizable());
+		itemName.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event arg0) {
+				if (itemName.getSelection()) {
+					column.setWidth(150);
+					column.setResizable(true);
+				} else {
+					column.setWidth(0);
+					column.setResizable(false);
+				}
+			}
+		});
 	}
 
 	/**
@@ -256,6 +338,10 @@ public class TableEditor extends EditorPart {
 		String[] titles = { "ID", "Log Name", "Log Type", "Timestamp" };
 		int[] bounds = { 50, 150, 100, 100 };
 
+		// Define the menu and assign to the table
+		Menu headerMenu = new Menu(viewer.getTable());
+		viewer.getTable().setMenu(headerMenu);
+
 		int columnNo = 0;
 		TableViewerColumn col = createTableViewerColumn(titles[columnNo],
 				bounds[columnNo], columnNo);
@@ -266,6 +352,7 @@ public class TableEditor extends EditorPart {
 				return Integer.toString(p.getLogId());
 			}
 		});
+		createMenuItem(headerMenu, col.getColumn());
 
 		++columnNo;
 		col = createTableViewerColumn(titles[columnNo], bounds[columnNo],
@@ -277,6 +364,7 @@ public class TableEditor extends EditorPart {
 				return p.getLogName();
 			}
 		});
+		createMenuItem(headerMenu, col.getColumn());
 
 		++columnNo;
 		col = createTableViewerColumn(titles[columnNo], bounds[columnNo],
@@ -288,6 +376,7 @@ public class TableEditor extends EditorPart {
 				return p.getLogType();
 			}
 		});
+		createMenuItem(headerMenu, col.getColumn());
 
 		++columnNo;
 		col = createTableViewerColumn(titles[columnNo], bounds[columnNo],
@@ -299,7 +388,7 @@ public class TableEditor extends EditorPart {
 				return Long.toString(p.getTimestamp());
 			}
 		});
-
+		createMenuItem(headerMenu, col.getColumn());
 	}
 
 	/**
